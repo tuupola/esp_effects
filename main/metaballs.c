@@ -79,7 +79,7 @@ float sqrt3(const float x)
     } u;
 
     u.x = x;
-    u.i = (1<<29) + (u.i >> 1) - (1<<22);
+    u.i = (1 << 29) + (u.i >> 1) - (1 << 22);
     return u.x;
 }
 
@@ -100,9 +100,9 @@ void metaballs_render()
             //printf("%f\n", sum);
             if (sum > 0.65) {
                 hagl_put_pixel(x, y, settings.color[0]);
-            } else if (sum > 0.5) {
+            } else if (sum > 0.45) {
                 hagl_put_pixel(x, y, settings.color[1]);
-            } else if (sum > 0.4) {
+            } else if (sum > 0.35) {
                 hagl_put_pixel(x, y, settings.color[2]);
             }
         }

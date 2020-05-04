@@ -77,10 +77,10 @@ void demo_task(void *params)
     char16_t message[128];
 
     struct settings settings;
-    settings.num = 3;
-    settings.radius.min = 10;
-    settings.radius.max = 20;
-    settings.velocity.min = 1;
+    settings.num = 5;
+    settings.radius.min = 12;
+    settings.radius.max = 18;
+    settings.velocity.min = 3;
     settings.velocity.max = 5;
     settings.min.x = 0;
     settings.min.y = 0;
@@ -99,8 +99,11 @@ void demo_task(void *params)
         xEventGroupSetBits(event, RENDER_FINISHED);
 
         hagl_set_clip_window(0, 0, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 1);
-        swprintf(message, sizeof(message), u"%.*f FPS  ", 2, fb_fps);
-        hagl_put_text(message, DISPLAY_WIDTH - 56, DISPLAY_HEIGHT - 14, green, font6x9);
+        swprintf(message, sizeof(message), u"%d METABALLS  ", settings.num);
+        hagl_put_text(message, 4, 4, green, font6x9);
+
+        swprintf(message, sizeof(message), u"%.*f FPS  ", 0, fb_fps);
+        hagl_put_text(message, DISPLAY_WIDTH - 40, DISPLAY_HEIGHT - 14, green, font6x9);
         hagl_set_clip_window(0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
     }
 
