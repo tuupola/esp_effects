@@ -43,13 +43,20 @@ SPDX-License-Identifier: MIT-0
 
 #include "alien.h"
 #include "metaballs.h"
+#include "plasma.h"
 
 static const char *TAG = "main";
 static EventGroupHandle_t event;
 static float fb_fps;
 static bitmap_t *bb;
+static uint8_t effect = 0;
 
 static const uint8_t RENDER_FINISHED = (1 << 0);
+
+static char demo[2][32] = {
+    "5 METABALLS",
+    "PALETTE PLASMA"
+};
 
 void flush_task(void *params)
 {
@@ -71,21 +78,44 @@ void flush_task(void *params)
     vTaskDelete(NULL);
 }
 
+void switch_task(void *params)
+{
+    while (1) {
+        effect = (effect + 1) % 2;
+        hagl_clear_clip_window();
+
+        vTaskDelay(5000 / portTICK_RATE_MS);
+    }
+
+    vTaskDelete(NULL);
+}
+
+
 void demo_task(void *params)
 {
     color_t green = hagl_color(0, 255, 0);
     char16_t message[128];
 
     metaballs_init();
+    plasma_init();
 
     while (1) {
-        hagl_clear_clip_window();
-        metaballs_animate();
-        metaballs_render();
+        switch(effect) {
+        case 0:
+            hagl_clear_clip_window();
+            metaballs_animate();
+            metaballs_render();
+            break;
+        case 1:
+            plasma_animate();
+            plasma_render();
+            break;
+        }
         xEventGroupSetBits(event, RENDER_FINISHED);
 
+        swprintf(message, sizeof(message), u"%s    ", demo[effect]);
         hagl_set_clip_window(0, 0, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 1);
-        hagl_put_text(u"5 METABALLS", 4, 4, green, font6x9);
+        hagl_put_text(message, 4, 4, green, font6x9);
 
         swprintf(message, sizeof(message), u"%.*f FPS  ", 0, fb_fps);
         hagl_put_text(message, DISPLAY_WIDTH - 40, DISPLAY_HEIGHT - 14, green, font6x9);
@@ -115,4 +145,5 @@ void app_main()
     xTaskCreatePinnedToCore(flush_task, "Framebuffer", 8192, NULL, 1, NULL, 0);
 #endif
     xTaskCreatePinnedToCore(demo_task, "Demo", 8192, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(switch_task, "Switch", 2048, NULL, 2, NULL, 1);
 }
