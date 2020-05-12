@@ -41,7 +41,7 @@ SPDX-License-Identifier: MIT-0
 #include <font6x9.h>
 #include <fps.h>
 
-#include "alien.h"
+// #include "alien.h"
 #include "metaballs.h"
 #include "plasma.h"
 #include "rotozoom.h"
@@ -99,6 +99,7 @@ void demo_task(void *params)
 
     metaballs_init();
     plasma_init();
+    rotozoom_init();
 
     while (1) {
         switch(effect) {
@@ -147,8 +148,8 @@ void app_main()
     ESP_LOGI(TAG, "Heap after HAGL init: %d", esp_get_free_heap_size());
 
 #ifdef HAGL_HAL_USE_BUFFERING
-    xTaskCreatePinnedToCore(flush_task, "Framebuffer", 8192, NULL, 1, NULL, 0);
+    xTaskCreatePinnedToCore(flush_task, "Framebuffer", 1024, NULL, 1, NULL, 0);
 #endif
-    xTaskCreatePinnedToCore(demo_task, "Demo", 8192, NULL, 1, NULL, 1);
-    xTaskCreatePinnedToCore(switch_task, "Switch", 2048, NULL, 2, NULL, 1);
+    xTaskCreatePinnedToCore(demo_task, "Demo", 5120, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(switch_task, "Switch", 1024, NULL, 2, NULL, 1);
 }
