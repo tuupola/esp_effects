@@ -44,6 +44,7 @@ SPDX-License-Identifier: MIT-0
 #include "alien.h"
 #include "metaballs.h"
 #include "plasma.h"
+#include "rotozoom.h"
 
 static const char *TAG = "main";
 static EventGroupHandle_t event;
@@ -53,9 +54,10 @@ static uint8_t effect = 0;
 
 static const uint8_t RENDER_FINISHED = (1 << 0);
 
-static char demo[2][32] = {
-    "5 METABALLS",
-    "PALETTE PLASMA"
+static char demo[3][32] = {
+    "5 METABALLS   ",
+    "PALETTE PLASMA",
+    "ROTOZOOM      ",
 };
 
 void flush_task(void *params)
@@ -81,15 +83,14 @@ void flush_task(void *params)
 void switch_task(void *params)
 {
     while (1) {
-        effect = (effect + 1) % 2;
+        effect = (effect + 1) % 3;
         hagl_clear_clip_window();
 
-        vTaskDelay(5000 / portTICK_RATE_MS);
+        vTaskDelay(10000 / portTICK_RATE_MS);
     }
 
     vTaskDelete(NULL);
 }
-
 
 void demo_task(void *params)
 {
@@ -109,6 +110,10 @@ void demo_task(void *params)
         case 1:
             plasma_animate();
             plasma_render();
+            break;
+        case 2:
+            rotozoom_animate();
+            rotozoom_render();
             break;
         }
         xEventGroupSetBits(event, RENDER_FINISHED);
