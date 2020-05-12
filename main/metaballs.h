@@ -24,27 +24,7 @@ SOFTWARE.
 SPDX-License-Identifier: MIT-0
 
 */
-#include <stdint.h>
 
-struct vector2 {
-    int16_t x;
-    int16_t y;
-};
-
-struct minmax {
-    uint16_t min;
-    uint16_t max;
-};
-
-struct settings {
-    uint8_t num;
-    struct vector2 min;
-    struct vector2 max;
-    struct minmax radius;
-    struct minmax velocity;
-    uint16_t color[3];
-};
-
-void metaballs_init(struct settings settings);
+void metaballs_init();
 void metaballs_animate();
 void metaballs_render();

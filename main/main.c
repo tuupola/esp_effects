@@ -36,12 +36,12 @@ SPDX-License-Identifier: MIT-0
 #include <freertos/event_groups.h>
 #include <esp_log.h>
 
-#include <hagl.h>
 #include <hagl_hal.h>
-#include <rgb565.h>
+#include <hagl.h>
 #include <font6x9.h>
 #include <fps.h>
 
+#include "alien.h"
 #include "metaballs.h"
 
 static const char *TAG = "main";
@@ -73,24 +73,10 @@ void flush_task(void *params)
 
 void demo_task(void *params)
 {
-    uint16_t green = rgb565(0, 255, 0);
+    color_t green = hagl_color(0, 255, 0);
     char16_t message[128];
 
-    struct settings settings;
-    settings.num = 5;
-    settings.radius.min = 12;
-    settings.radius.max = 18;
-    settings.velocity.min = 3;
-    settings.velocity.max = 5;
-    settings.min.x = 0;
-    settings.min.y = 0;
-    settings.max.x = DISPLAY_WIDTH - 1;
-    settings.max.y = DISPLAY_HEIGHT - 1;
-
-    settings.color[0] = rgb565(255, 255, 255);
-    settings.color[1] = rgb565(210, 210, 210);
-    settings.color[2] = rgb565(150, 150, 150);
-    metaballs_init(settings);
+    metaballs_init();
 
     while (1) {
         hagl_clear_clip_window();
@@ -99,8 +85,7 @@ void demo_task(void *params)
         xEventGroupSetBits(event, RENDER_FINISHED);
 
         hagl_set_clip_window(0, 0, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 1);
-        swprintf(message, sizeof(message), u"%d METABALLS  ", settings.num);
-        hagl_put_text(message, 4, 4, green, font6x9);
+        hagl_put_text(u"5 METABALLS", 4, 4, green, font6x9);
 
         swprintf(message, sizeof(message), u"%.*f FPS  ", 0, fb_fps);
         hagl_put_text(message, DISPLAY_WIDTH - 40, DISPLAY_HEIGHT - 14, green, font6x9);
@@ -129,5 +114,5 @@ void app_main()
 #ifdef HAGL_HAL_USE_BUFFERING
     xTaskCreatePinnedToCore(flush_task, "Framebuffer", 8192, NULL, 1, NULL, 0);
 #endif
-    xTaskCreatePinnedToCore(demo_task, "Demo", 4096, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(demo_task, "Demo", 8192, NULL, 1, NULL, 1);
 }

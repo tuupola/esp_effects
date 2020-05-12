@@ -27,11 +27,14 @@ SPDX-License-Identifier: MIT-0
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <math.h>
 #include <hagl.h>
-#include <rgb565.h>
 
 #include "metaballs.h"
+
+struct vector2 {
+    int16_t x;
+    int16_t y;
+};
 
 struct ball {
     struct vector2 position;
@@ -40,70 +43,64 @@ struct ball {
     uint16_t color;
 };
 
-struct ball balls[255];
-struct settings settings;
+struct ball balls[16];
 
-void metaballs_init(struct settings incoming)
+static const uint8_t NUM_BALLS = 5;
+static const uint8_t MIN_VELOCITY = 3;
+static const uint8_t MAX_VELOCITY = 5;
+static const uint8_t MIN_RADIUS = 10;
+static const uint8_t MAX_RADIUS = 20;
+
+void metaballs_init()
 {
-    settings = incoming;
-    for (int16_t i = 0; i < settings.num; i++) {
-        balls[i].radius = (rand() % settings.radius.max) + settings.radius.min;
+    for (int16_t i = 0; i < NUM_BALLS; i++) {
+        balls[i].radius = (rand() % MAX_RADIUS) + MIN_RADIUS;
         balls[i].color = 0xffff;
-        balls[i].position.x = rand() % settings.max.x;
-        balls[i].position.y = rand() % settings.max.y;
-        balls[i].velocity.x = (rand() % settings.velocity.max) + settings.velocity.min;
-        balls[i].velocity.y = (rand() % settings.velocity.max) + settings.velocity.min;
+        balls[i].position.x = rand() % DISPLAY_WIDTH;
+        balls[i].position.y = rand() % DISPLAY_HEIGHT;
+        balls[i].velocity.x = (rand() % MAX_VELOCITY) + MIN_VELOCITY;
+        balls[i].velocity.y = (rand() % MAX_VELOCITY) + MIN_VELOCITY;
     }
 }
 
 void metaballs_animate()
 {
-    for (int16_t i = 0; i < settings.num; i++) {
+    for (int16_t i = 0; i < NUM_BALLS; i++) {
         balls[i].position.x += balls[i].velocity.x;
         balls[i].position.y += balls[i].velocity.y;
 
-        if ((balls[i].position.x < 0) | (balls[i].position.x > settings.max.x)) {
+        if ((balls[i].position.x < 0) | (balls[i].position.x > DISPLAY_WIDTH)) {
             balls[i].velocity.x = balls[i].velocity.x * -1;
         }
-        if ((balls[i].position.y < 0) | (balls[i].position.y > settings.max.y)) {
+        if ((balls[i].position.y < 0) | (balls[i].position.y > DISPLAY_HEIGHT)) {
             balls[i].velocity.y = balls[i].velocity.y * -1;
         }
     }
 }
 
-float sqrt3(const float x)
-{
-    union {
-        int i;
-        float x;
-    } u;
-
-    u.x = x;
-    u.i = (1 << 29) + (u.i >> 1) - (1 << 22);
-    return u.x;
-}
-
 void metaballs_render()
 {
-    for(uint16_t x = 0; x < settings.max.x; x += 2) {
-        for(uint16_t y = 0; y < settings.max.y; y += 2) {
+    color_t black = hagl_color(0, 0, 0);
+    color_t white = hagl_color(255, 255, 255);
+    color_t green = hagl_color(0, 255, 0);
+
+    for(uint16_t x = 0; x < DISPLAY_WIDTH; x = x + 2) {
+        for(uint16_t y = 0; y < DISPLAY_HEIGHT; y = y + 2) {
             float sum = 0;
-            for (uint8_t i = 0; i < settings.num; i++) {
+            for (uint8_t i = 0; i < NUM_BALLS; i++) {
                 float dx = x - balls[i].position.x;
                 float dy = y - balls[i].position.y;
                 float d2 = dx * dx + dy * dy;
                 sum += balls[i].radius * balls[i].radius / d2;
-                // sum += balls[i].radius / sqrt3(d2);
-
+                // sum += balls[i].radius / sqrt(d2);
             }
 
-            //printf("%f\n", sum);
             if (sum > 0.65) {
-                hagl_put_pixel(x, y, settings.color[0]);
-            } else if (sum > 0.45) {
-                hagl_put_pixel(x, y, settings.color[1]);
-            } else if (sum > 0.35) {
-                hagl_put_pixel(x, y, settings.color[2]);
+                hagl_put_pixel(x, y, black);
+            } else if (sum > 0.5) {
+                hagl_put_pixel(x, y, white);
+            } else if (sum > 0.4) {
+                hagl_put_pixel(x, y, green);
             }
         }
     }
