@@ -34,7 +34,8 @@ SPDX-License-Identifier: MIT-0
 color_t *palette;
 uint8_t *plasma;
 
-static const uint8_t PLASMA_SPEED = 4;
+static const uint8_t SPEED = 6;
+static const uint8_t STEP = 2;
 
 void plasma_init()
 {
@@ -50,8 +51,8 @@ void plasma_init()
         palette[i] = hagl_color(r, g, b);
     }
 
-    for (uint16_t x = 0; x < DISPLAY_WIDTH; x++) {
-        for (uint16_t y = 0; y < DISPLAY_HEIGHT; y++) {
+    for (uint16_t x = 0; x < DISPLAY_WIDTH; x = x + STEP) {
+        for (uint16_t y = 0; y < DISPLAY_HEIGHT; y = y + STEP) {
                 float v1 = 128.0 + (128.0 * sin(x / 32.0));
                 float v2 = 128.0 + (128.0 * sin(y / 24.0));
                 float v3 = 128.0 + (128.0 * sin(sqrt(x * x + y * y) / 24.0));
@@ -64,8 +65,8 @@ void plasma_init()
 
 void plasma_render()
 {
-    for (uint16_t x = 0; x < DISPLAY_WIDTH; x++) {
-        for (uint16_t y = 0; y < DISPLAY_HEIGHT; y++) {
+    for (uint16_t x = 0; x < DISPLAY_WIDTH; x = x + STEP) {
+        for (uint16_t y = 0; y < DISPLAY_HEIGHT; y = y + STEP) {
             uint8_t *ptr = (plasma + x + DISPLAY_WIDTH * y);
             color_t color = palette[*ptr];
             hagl_put_pixel(x, y, color);
@@ -75,11 +76,11 @@ void plasma_render()
 
 void plasma_animate()
 {
-    for (uint16_t x = 0; x < DISPLAY_WIDTH; x++) {
-        for (uint16_t y = 0; y < DISPLAY_HEIGHT; y++) {
+    for (uint16_t x = 0; x < DISPLAY_WIDTH; x = x + STEP) {
+        for (uint16_t y = 0; y < DISPLAY_HEIGHT; y = y + STEP) {
                 uint8_t *ptr = (plasma + x + DISPLAY_WIDTH * y);
                 uint8_t color = *ptr;
-                color += PLASMA_SPEED;
+                color += SPEED;
                 color %= 256;
                 *ptr = color;
         }

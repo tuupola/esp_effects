@@ -30,7 +30,9 @@ SPDX-License-Identifier: MIT-0
 
 #include "head.h"
 
-static const uint8_t ROTOZOOM_SPEED = 2;
+static const uint8_t SPEED = 1;
+static const uint8_t STEP = 2;
+
 static uint16_t angle;
 static float sinlut[360];
 static float coslut[360];
@@ -53,10 +55,8 @@ void rotozoom_render()
     c = coslut[angle];
     z = s * 1.2;
 
-    for (uint16_t x = 0; x < DISPLAY_WIDTH; x++) {
-        x++;
-        for (uint16_t y = 0; y < DISPLAY_HEIGHT; y++) {
-            y++;
+    for (uint16_t x = 0; x < DISPLAY_WIDTH; x = x + STEP) {
+        for (uint16_t y = 0; y < DISPLAY_HEIGHT; y = y + STEP) {
             uint8_t u = (uint8_t)((x * c - y * s) * z) % HEAD_WIDTH;
             uint8_t v = (uint8_t)((x * s + y * c) * z) % HEAD_HEIGHT;
 
@@ -68,5 +68,5 @@ void rotozoom_render()
 
 void rotozoom_animate()
 {
-    angle = (angle + ROTOZOOM_SPEED) % 360;
+    angle = (angle + SPEED) % 360;
 }

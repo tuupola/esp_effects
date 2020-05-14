@@ -45,14 +45,16 @@ struct ball {
 
 struct ball balls[16];
 
-static const uint8_t NUM_BALLS = 5;
+static const uint8_t NUM_BALLS = 3;
 static const uint8_t MIN_VELOCITY = 3;
 static const uint8_t MAX_VELOCITY = 5;
-static const uint8_t MIN_RADIUS = 10;
-static const uint8_t MAX_RADIUS = 20;
+static const uint8_t MIN_RADIUS = 20;
+static const uint8_t MAX_RADIUS = 30;
+static const uint8_t STEP = 2;
 
 void metaballs_init()
 {
+    /* Set up imaginary balls inside screen coordinates. */
     for (int16_t i = 0; i < NUM_BALLS; i++) {
         balls[i].radius = (rand() % MAX_RADIUS) + MIN_RADIUS;
         balls[i].color = 0xffff;
@@ -69,23 +71,28 @@ void metaballs_animate()
         balls[i].position.x += balls[i].velocity.x;
         balls[i].position.y += balls[i].velocity.y;
 
+        /* Touch left or right edge, change direction. */
         if ((balls[i].position.x < 0) | (balls[i].position.x > DISPLAY_WIDTH)) {
             balls[i].velocity.x = balls[i].velocity.x * -1;
         }
+
+        /* Touch top or bottom edge, change direction. */
         if ((balls[i].position.y < 0) | (balls[i].position.y > DISPLAY_HEIGHT)) {
             balls[i].velocity.y = balls[i].velocity.y * -1;
         }
     }
 }
 
+/* http://www.geisswerks.com/ryan/BLOBS/blobs.html */
 void metaballs_render()
 {
+    color_t background = hagl_color(0, 0, 0);
     color_t black = hagl_color(0, 0, 0);
     color_t white = hagl_color(255, 255, 255);
     color_t green = hagl_color(0, 255, 0);
 
-    for(uint16_t x = 0; x < DISPLAY_WIDTH; x = x + 2) {
-        for(uint16_t y = 0; y < DISPLAY_HEIGHT; y = y + 2) {
+    for (uint16_t y = 0; y < DISPLAY_HEIGHT; y = y + STEP) {
+        for (uint16_t x = 0; x < DISPLAY_WIDTH; x = x + STEP) {
             float sum = 0;
             for (uint8_t i = 0; i < NUM_BALLS; i++) {
                 float dx = x - balls[i].position.x;
@@ -101,6 +108,8 @@ void metaballs_render()
                 hagl_put_pixel(x, y, white);
             } else if (sum > 0.4) {
                 hagl_put_pixel(x, y, green);
+            } else {
+                hagl_put_pixel(x, y, background);
             }
         }
     }
