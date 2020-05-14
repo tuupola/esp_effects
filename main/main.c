@@ -53,9 +53,10 @@ static bitmap_t *bb;
 static uint8_t effect = 0;
 
 static const uint8_t RENDER_FINISHED = (1 << 0);
+static const uint8_t FLUSH_STARTED= (1 << 1);
 
 static char demo[3][32] = {
-    "5 METABALLS   ",
+    "3 METABALLS   ",
     "PALETTE PLASMA",
     "ROTOZOOM      ",
 };
@@ -72,6 +73,7 @@ void flush_task(void *params)
         );
 
         if ((bits & RENDER_FINISHED) != 0 ) {
+            xEventGroupSetBits(event, FLUSH_STARTED);
             hagl_flush();
             fb_fps = fps();
         }
@@ -80,13 +82,27 @@ void flush_task(void *params)
     vTaskDelete(NULL);
 }
 
+static void wait_for_vsync(uint8_t delay_ms)
+{
+    EventBits_t bits = xEventGroupWaitBits(
+        event,
+        FLUSH_STARTED,
+        pdTRUE,
+        pdFALSE,
+        10000 / portTICK_RATE_MS
+    );
+    if ((bits & FLUSH_STARTED) != 0 ) {
+        vTaskDelay(delay_ms / portTICK_RATE_MS);
+    }
+}
+
 void switch_task(void *params)
 {
     while (1) {
+        hagl_clear_screen();
         effect = (effect + 1) % 3;
-        hagl_clear_clip_window();
 
-        vTaskDelay(10000 / portTICK_RATE_MS);
+        vTaskDelay(15000 / portTICK_RATE_MS);
     }
 
     vTaskDelete(NULL);
@@ -104,16 +120,21 @@ void demo_task(void *params)
     while (1) {
         switch(effect) {
         case 0:
-            hagl_clear_clip_window();
             metaballs_animate();
             metaballs_render();
             break;
         case 1:
             plasma_animate();
+#ifdef CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING
+            wait_for_vsync(40);
+#endif
             plasma_render();
             break;
         case 2:
             rotozoom_animate();
+#ifdef CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING
+            wait_for_vsync(40);
+#endif
             rotozoom_render();
             break;
         }
