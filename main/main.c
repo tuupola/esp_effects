@@ -41,7 +41,6 @@ SPDX-License-Identifier: MIT-0
 #include <font6x9.h>
 #include <fps.h>
 
-// #include "alien.h"
 #include "metaballs.h"
 #include "plasma.h"
 #include "rotozoom.h"
@@ -61,6 +60,10 @@ static char demo[3][32] = {
     "ROTOZOOM      ",
 };
 
+/*
+ * Flushes the backbuffer to the display. Needed when using
+ * double or triple buffering.
+ */
 void flush_task(void *params)
 {
     while (1) {
@@ -72,6 +75,7 @@ void flush_task(void *params)
             0
         );
 
+        /* Flush only when RENDER_FINISHED is set. */
         if ((bits & RENDER_FINISHED) != 0 ) {
             xEventGroupSetBits(event, FLUSH_STARTED);
             hagl_flush();
@@ -82,8 +86,14 @@ void flush_task(void *params)
     vTaskDelete(NULL);
 }
 
-static void wait_for_vsync(uint8_t delay_ms)
+/*
+ * Software vsync. Waits for flush to start. Needed to avoid
+ * tearing when using double buffering, NOP otherwise. This
+ * could be handler with IRQ's if the display supports it.
+ */
+static void wait_for_vsync()
 {
+#ifdef CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING
     EventBits_t bits = xEventGroupWaitBits(
         event,
         FLUSH_STARTED,
@@ -92,10 +102,14 @@ static void wait_for_vsync(uint8_t delay_ms)
         10000 / portTICK_RATE_MS
     );
     if ((bits & FLUSH_STARTED) != 0 ) {
-        vTaskDelay(delay_ms / portTICK_RATE_MS);
+        vTaskDelay(3);
     }
+#endif /* CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING */
 }
 
+/*
+ * Changes the effect every 15 seconds.
+ */
 void switch_task(void *params)
 {
     while (1) {
@@ -108,6 +122,9 @@ void switch_task(void *params)
     vTaskDelete(NULL);
 }
 
+/*
+ * Runs the actual demo effect.
+ */
 void demo_task(void *params)
 {
     color_t green = hagl_color(0, 255, 0);
@@ -121,29 +138,29 @@ void demo_task(void *params)
         switch(effect) {
         case 0:
             metaballs_animate();
+            wait_for_vsync();
             metaballs_render();
             break;
         case 1:
             plasma_animate();
-#ifdef CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING
-            wait_for_vsync(40);
-#endif
+            wait_for_vsync();
             plasma_render();
             break;
         case 2:
             rotozoom_animate();
-#ifdef CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING
-            wait_for_vsync(40);
-#endif
+            wait_for_vsync();
             rotozoom_render();
             break;
         }
+        /* Notify flush task that rendering has finished. */
         xEventGroupSetBits(event, RENDER_FINISHED);
 
+        /* Print the message on top left corner. */
         swprintf(message, sizeof(message), u"%s    ", demo[effect]);
         hagl_set_clip_window(0, 0, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 1);
         hagl_put_text(message, 4, 4, green, font6x9);
 
+        /* Print the message on lower right corner. */
         swprintf(message, sizeof(message), u"%.*f FPS  ", 0, fb_fps);
         hagl_put_text(message, DISPLAY_WIDTH - 40, DISPLAY_HEIGHT - 14, green, font6x9);
         hagl_set_clip_window(0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
@@ -159,11 +176,8 @@ void app_main()
 
     event = xEventGroupCreate();
 
-    bb = hagl_init();
-    if (bb) {
-        ESP_LOGI(TAG, "Back buffer: %dx%dx%d", bb->width, bb->height, bb->depth);
-    }
-
+    hagl_init();
+    /* Reserve 20 pixels in top and bottom for debug texts. */
     hagl_set_clip_window(0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
 
     ESP_LOGI(TAG, "Heap after HAGL init: %d", esp_get_free_heap_size());
