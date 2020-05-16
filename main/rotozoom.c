@@ -58,6 +58,7 @@ void rotozoom_render()
 
     for (uint16_t x = 0; x < DISPLAY_WIDTH; x = x + STEP) {
         for (uint16_t y = 0; y < DISPLAY_HEIGHT; y = y + STEP) {
+
             /* Get a rotated pixel from the head image. */
             uint8_t u = (uint8_t)((x * c - y * s) * z) % HEAD_WIDTH;
             uint8_t v = (uint8_t)((x * s + y * c) * z) % HEAD_HEIGHT;

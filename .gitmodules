@@ -4,6 +4,3 @@
 [submodule "components/hagl_esp_mipi"]
 	path = components/hagl_esp_mipi
 	url = git@github.com:tuupola/hagl_esp_mipi.git
-[submodule "components/esp_mipi"]
-	path = components/esp_mipi
-	url = git@github.com:tuupola/esp_mipi.git
