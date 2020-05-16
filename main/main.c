@@ -169,7 +169,7 @@ void app_main()
     ESP_LOGI(TAG, "Heap after HAGL init: %d", esp_get_free_heap_size());
 
 #ifdef HAGL_HAL_USE_BUFFERING
-    xTaskCreatePinnedToCore(flush_task, "Framebuffer", 1024, NULL, 1, NULL, 0);
+    xTaskCreatePinnedToCore(flush_task, "Flush", 2048, NULL, 1, NULL, 0);
 #endif
     xTaskCreatePinnedToCore(demo_task, "Demo", 5120, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(switch_task, "Switch", 1024, NULL, 2, NULL, 1);
