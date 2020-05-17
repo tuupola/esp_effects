@@ -7,7 +7,7 @@ Created to test the [HAGL graphics library](https://github.com/tuupola/hagl). Re
 ```
 $ git clone git@github.com:tuupola/esp_effects.git --recursive
 $ cd esp_effects
-$ cp sdkconfig.ttgo-t-display sdkconfig
+$ cp sdkconfig.m5stack sdkconfig
 $ make -j8 flash
 ```
 
