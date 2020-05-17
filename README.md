@@ -1,5 +1,7 @@
 ## Old schoold demo effects for ESP32
 
+![ESP effects](https://appelsiini.net/img/2020/esp-effects.jpg)
+
 Created to test the [HAGL graphics library](https://github.com/tuupola/hagl). Ready made config files for M5Stack, TTGO T-Display and TTGO T4 V13. For example to compile and flash for M5Stack run the following.
 
 ```
