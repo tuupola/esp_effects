@@ -26,6 +26,7 @@ SPDX-License-Identifier: MIT-0
 */
 
 #include <stdint.h>
+#include <stdlib.h>
 #include <math.h>
 #include <hagl.h>
 
@@ -74,7 +75,11 @@ void plasma_render()
             uint8_t *ptr = (plasma + x + DISPLAY_WIDTH * y);
             color_t color = palette[*ptr];
             /* Put a pixel to the display. */
-            hagl_put_pixel(x, y, color);
+            if (1 == STEP) {
+                hagl_put_pixel(x, y, color);
+            } else {
+                hagl_fill_rectangle(x, y, x + STEP, y + STEP, color);
+            }
         }
     }
 }

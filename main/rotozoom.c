@@ -64,7 +64,11 @@ void rotozoom_render()
             uint8_t v = (uint8_t)((x * s + y * c) * z) % HEAD_HEIGHT;
             color_t *color = (color_t*) (head + HEAD_WIDTH * sizeof(color_t) * v + sizeof(color_t) * u);
 
-            hagl_put_pixel(x, y, *color);
+            if (1 == STEP) {
+                hagl_put_pixel(x, y, *color);
+            } else {
+                hagl_fill_rectangle(x, y, x + STEP, y + STEP, *color);
+            }
         }
     }
 }
