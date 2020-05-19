@@ -48,7 +48,6 @@ SPDX-License-Identifier: MIT-0
 static const char *TAG = "main";
 static EventGroupHandle_t event;
 static float fb_fps;
-static bitmap_t *bb;
 static uint8_t effect = 0;
 
 static const uint8_t RENDER_FINISHED = (1 << 0);
@@ -94,16 +93,14 @@ void flush_task(void *params)
 static void wait_for_vsync()
 {
 #ifdef CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING
-    EventBits_t bits = xEventGroupWaitBits(
+    xEventGroupWaitBits(
         event,
         FLUSH_STARTED,
         pdTRUE,
         pdFALSE,
         10000 / portTICK_RATE_MS
     );
-    if ((bits & FLUSH_STARTED) != 0 ) {
-        vTaskDelay(3);
-    }
+    ets_delay_us(25000);
 #endif /* CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING */
 }
 
@@ -183,8 +180,8 @@ void app_main()
     ESP_LOGI(TAG, "Heap after HAGL init: %d", esp_get_free_heap_size());
 
 #ifdef HAGL_HAL_USE_BUFFERING
-    xTaskCreatePinnedToCore(flush_task, "Flush", 2048, NULL, 1, NULL, 0);
+    xTaskCreatePinnedToCore(flush_task, "Flush", 4096, NULL, 1, NULL, 0);
 #endif
-    xTaskCreatePinnedToCore(demo_task, "Demo", 5120, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(demo_task, "Demo", 8092, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(switch_task, "Switch", 1024, NULL, 2, NULL, 1);
 }
