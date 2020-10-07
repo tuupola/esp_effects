@@ -2,7 +2,7 @@
 
 ![ESP effects](https://appelsiini.net/img/2020/esp-effects.jpg)
 
-Created to test the [HAGL graphics library](https://github.com/tuupola/hagl). Ready made config files for M5Stack, TTGO T-Display and TTGO T4 V13. For example to compile and flash for M5Stack run the following.
+Created to test the [HAGL graphics library](https://github.com/tuupola/hagl). Ready made config files for M5Stack, TTGO T-Display, TTGO T4 V13 and TTGO T-Watch 2020. For example to compile and flash for M5Stack run the following.
 
 ```
 $ git clone git@github.com:tuupola/esp_effects.git --recursive
