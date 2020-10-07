@@ -36,10 +36,12 @@ SPDX-License-Identifier: MIT-0
 #include <freertos/event_groups.h>
 #include <esp_log.h>
 
-#include <hagl_hal.h>
-#include <hagl.h>
+#include <axp202.h>
 #include <font6x9.h>
 #include <fps.h>
+#include <hagl_hal.h>
+#include <hagl.h>
+#include <i2c_helper.h>
 
 #include "metaballs.h"
 #include "plasma.h"
@@ -170,6 +172,22 @@ void app_main()
 {
     ESP_LOGI(TAG, "SDK version: %s", esp_get_idf_version());
     ESP_LOGI(TAG, "Heap when starting: %d", esp_get_free_heap_size());
+
+    static i2c_port_t i2c_port = I2C_NUM_0;
+
+#ifdef CONFIG_DEVICE_HAS_AXP202
+    /* TTGO T-Watch-2020 uses AXP202 PMU. */
+    axp202_t axp;
+
+    ESP_LOGI(TAG, "Initializing I2C");
+    i2c_init(i2c_port);
+
+    ESP_LOGI(TAG, "Initializing AXP202");
+    axp.read = &i2c_read;
+    axp.write = &i2c_write;
+    axp.handle = &i2c_port;
+    axp202_init(&axp);
+#endif /* CONFIG_DEVICE_HAS_AXP202 */
 
     event = xEventGroupCreate();
 

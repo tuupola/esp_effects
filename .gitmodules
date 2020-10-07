@@ -4,3 +4,9 @@
 [submodule "components/hagl_esp_mipi"]
 	path = components/hagl_esp_mipi
 	url = git@github.com:tuupola/hagl_esp_mipi.git
+[submodule "components/axp202"]
+	path = components/axp202
+	url = git@github.com:tuupola/axp202.git
+[submodule "components/esp_i2c_helper"]
+	path = components/esp_i2c_helper
+	url = git@github.com:tuupola/esp_i2c_helper.git
