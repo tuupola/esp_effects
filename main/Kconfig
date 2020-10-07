@@ -1,0 +1,6 @@
+menu "Device specific config"
+
+config DEVICE_HAS_AXP202
+    bool "Use AXP202"
+
+endmenu
