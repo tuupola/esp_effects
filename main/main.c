@@ -189,6 +189,20 @@ void app_main()
     axp202_init(&axp);
 #endif /* CONFIG_DEVICE_HAS_AXP202 */
 
+#ifdef CONFIG_DEVICE_HAS_AXP192
+    /* M5StickC uses AXP192 PMU. */
+    axp192_t axp;
+
+    ESP_LOGI(TAG, "Initializing I2C");
+    i2c_init(i2c_port);
+
+    ESP_LOGI(TAG, "Initializing AXP192");
+    axp.read = &i2c_read;
+    axp.write = &i2c_write;
+    axp.handle = &i2c_port;
+    axp192_init(&axp);
+#endif /* CONFIG_DEVICE_HAS_AXP192 */
+
     event = xEventGroupCreate();
 
     hagl_init();
