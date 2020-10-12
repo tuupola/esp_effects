@@ -4,7 +4,7 @@
 
 Created to test the [HAGL graphics library](https://github.com/tuupola/hagl). For quick reference see the [recording on Vimeo](https://vimeo.com/419551395).
 
-Ready made config files for M5Stack, TTGO T-Display, TTGO T4 V13 and TTGO T-Watch 2020. For example to compile and flash for M5Stack run the following.
+Ready made config files for M5Stack, M5StickC, TTGO T-Display, TTGO T4 V13 and TTGO T-Watch 2020. For example to compile and flash for M5Stack run the following.
 
 ```
 $ git clone git@github.com:tuupola/esp_effects.git --recursive
