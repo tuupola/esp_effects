@@ -48,8 +48,8 @@ struct ball balls[16];
 static const uint8_t NUM_BALLS = 3;
 static const uint8_t MIN_VELOCITY = 3;
 static const uint8_t MAX_VELOCITY = 5;
-static const uint8_t MIN_RADIUS = 22;
-static const uint8_t MAX_RADIUS = 32;
+static const uint8_t MIN_RADIUS = 10;
+static const uint8_t MAX_RADIUS = 20;
 static const uint8_t STEP = 2;
 
 void metaballs_init()
