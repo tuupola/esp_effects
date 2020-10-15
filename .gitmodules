@@ -2,7 +2,7 @@
 	path = components/hagl
 	url = git@github.com:tuupola/hagl.git
 [submodule "components/hagl_esp_mipi"]
-	path = components/hagl_esp_mipi
+	path = components/hagl_hal
 	url = git@github.com:tuupola/hagl_esp_mipi.git
 [submodule "components/axp202"]
 	path = components/axp202
