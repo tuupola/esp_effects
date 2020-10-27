@@ -127,7 +127,7 @@ void switch_task(void *params)
 void demo_task(void *params)
 {
     color_t green = hagl_color(0, 255, 0);
-    char16_t message[128];
+    wchar_t message[128];
 
     metaballs_init();
     plasma_init();
@@ -173,10 +173,9 @@ void app_main()
     ESP_LOGI(TAG, "SDK version: %s", esp_get_idf_version());
     ESP_LOGI(TAG, "Heap when starting: %d", esp_get_free_heap_size());
 
-    static i2c_port_t i2c_port = I2C_NUM_0;
-
 #ifdef CONFIG_DEVICE_HAS_AXP202
     /* TTGO T-Watch-2020 uses AXP202 PMU. */
+    static i2c_port_t i2c_port = I2C_NUM_0;
     axp202_t axp;
 
     ESP_LOGI(TAG, "Initializing I2C");
@@ -191,6 +190,7 @@ void app_main()
 
 #ifdef CONFIG_DEVICE_HAS_AXP192
     /* M5StickC uses AXP192 PMU. */
+    static i2c_port_t i2c_port = I2C_NUM_0;
     axp192_t axp;
 
     ESP_LOGI(TAG, "Initializing I2C");
