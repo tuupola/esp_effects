@@ -36,7 +36,13 @@ SPDX-License-Identifier: MIT-0
 #include <freertos/event_groups.h>
 #include <esp_log.h>
 
+#ifdef CONFIG_DEVICE_HAS_AXP192
+#include <axp192.h>
+#endif /* CONFIG_DEVICE_HAS_AXP192 */
+#ifdef CONFIG_DEVICE_HAS_AXP202
 #include <axp202.h>
+#endif /* CONFIG_DEVICE_HAS_AXP202 */
+
 #include <font6x9.h>
 #include <fps.h>
 #include <hagl_hal.h>
