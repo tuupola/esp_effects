@@ -37,17 +37,18 @@ SPDX-License-Identifier: MIT-0
 #include <esp_log.h>
 
 #ifdef CONFIG_DEVICE_HAS_AXP192
+#include <i2c_helper.h>
 #include <axp192.h>
 #endif /* CONFIG_DEVICE_HAS_AXP192 */
 #ifdef CONFIG_DEVICE_HAS_AXP202
+#include <i2c_helper.h>
 #include <axp202.h>
 #endif /* CONFIG_DEVICE_HAS_AXP202 */
 
 #include <font6x9.h>
-#include <fps.h>
+#include <aps.h>
 #include <hagl_hal.h>
 #include <hagl.h>
-#include <i2c_helper.h>
 
 #include "metaballs.h"
 #include "plasma.h"
@@ -86,7 +87,7 @@ void flush_task(void *params)
         if ((bits & RENDER_FINISHED) != 0 ) {
             xEventGroupSetBits(event, FLUSH_STARTED);
             hagl_flush();
-            fb_fps = fps();
+            fb_fps = aps(1);
         }
     }
 
@@ -120,7 +121,7 @@ void switch_task(void *params)
     while (1) {
         hagl_clear_screen();
         effect = (effect + 1) % 3;
-
+        aps(APS_RESET);
         vTaskDelay(15000 / portTICK_RATE_MS);
     }
 
