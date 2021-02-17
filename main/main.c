@@ -136,9 +136,15 @@ void demo_task(void *params)
     color_t green = hagl_color(0, 255, 0);
     wchar_t message[128];
 
+    ESP_LOGI(TAG, "Initializing metaballs");
     metaballs_init();
+    ESP_LOGI(TAG, "Initializing plasma");
     plasma_init();
+    ESP_LOGI(TAG, "Initializing rotozoom");
     rotozoom_init();
+
+    /* Avoid waiting when running for the first time. */
+    xEventGroupSetBits(event, RENDER_FINISHED);
 
     while (1) {
         switch(effect) {
