@@ -116,7 +116,7 @@ void metaballs_render()
             if (1 == STEP) {
                 hagl_put_pixel(x, y, color);
             } else {
-                hagl_fill_rectangle(x, y, x + STEP, y + STEP, color);
+                hagl_fill_rectangle(x, y, x + STEP - 1, y + STEP - 1, color);
             }
         }
     }
