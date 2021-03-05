@@ -119,9 +119,13 @@ static void wait_for_vsync()
 void switch_task(void *params)
 {
     while (1) {
+        /* Print the message in the console. */
+        ESP_LOGI(TAG, "%s %.*f FPS", demo[effect], 1, fb_fps);
+
         hagl_clear_screen();
         effect = (effect + 1) % 3;
         aps(APS_RESET);
+
         vTaskDelay(15000 / portTICK_RATE_MS);
     }
 
@@ -228,5 +232,5 @@ void app_main()
     xTaskCreatePinnedToCore(flush_task, "Flush", 4096, NULL, 1, NULL, 0);
 #endif
     xTaskCreatePinnedToCore(demo_task, "Demo", 8092, NULL, 1, NULL, 1);
-    xTaskCreatePinnedToCore(switch_task, "Switch", 1024, NULL, 2, NULL, 1);
+    xTaskCreatePinnedToCore(switch_task, "Switch", 2048, NULL, 2, NULL, 1);
 }
