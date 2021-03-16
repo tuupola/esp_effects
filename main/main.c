@@ -47,6 +47,7 @@ SPDX-License-Identifier: MIT-0
 
 #include <font6x9.h>
 #include <aps.h>
+#include <fps.h>
 #include <hagl_hal.h>
 #include <hagl.h>
 
@@ -57,6 +58,7 @@ SPDX-License-Identifier: MIT-0
 static const char *TAG = "main";
 static EventGroupHandle_t event;
 static float fb_fps;
+static float fb_bps;
 static uint8_t effect = 0;
 
 static const uint8_t RENDER_FINISHED = (1 << 0);
@@ -75,6 +77,7 @@ static char demo[3][32] = {
 void flush_task(void *params)
 {
     while (1) {
+        size_t bytes = 0;
         EventBits_t bits = xEventGroupWaitBits(
             event,
             RENDER_FINISHED,
@@ -86,8 +89,9 @@ void flush_task(void *params)
         /* Flush only when RENDER_FINISHED is set. */
         if ((bits & RENDER_FINISHED) != 0 ) {
             xEventGroupSetBits(event, FLUSH_STARTED);
-            hagl_flush();
-            fb_fps = aps(1);
+            bytes = hagl_flush();
+            fb_bps = aps(bytes);
+            fb_fps = fps();
         }
     }
 
@@ -109,12 +113,12 @@ static void wait_for_vsync()
         pdFALSE,
         10000 / portTICK_RATE_MS
     );
-    ets_delay_us(25000);
+    ets_delay_us(18000);
 #endif /* CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING */
 }
 
 /*
- * Changes the effect every 15 seconds.
+ * Changes the effect every 10 seconds.
  */
 void switch_task(void *params)
 {
@@ -126,7 +130,7 @@ void switch_task(void *params)
         effect = (effect + 1) % 3;
         aps(APS_RESET);
 
-        vTaskDelay(15000 / portTICK_RATE_MS);
+        vTaskDelay(10000 / portTICK_RATE_MS);
     }
 
     vTaskDelete(NULL);
@@ -176,9 +180,14 @@ void demo_task(void *params)
         hagl_set_clip_window(0, 0, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 1);
         hagl_put_text(message, 4, 4, green, font6x9);
 
-        /* Print the message on lower right corner. */
+        /* Print the message on lower left corner. */
         swprintf(message, sizeof(message), u"%.*f FPS  ", 0, fb_fps);
-        hagl_put_text(message, DISPLAY_WIDTH - 40, DISPLAY_HEIGHT - 14, green, font6x9);
+        hagl_put_text(message, 4, DISPLAY_HEIGHT - 14, green, font6x9);
+
+        /* Print the message on lower right corner. */
+        swprintf(message, sizeof(message), u"%.*f KBPS  ", 0, fb_bps / 1000);
+        hagl_put_text(message, DISPLAY_WIDTH - 60, DISPLAY_HEIGHT - 14, green, font6x9);
+
         hagl_set_clip_window(0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
     }
 
@@ -187,6 +196,8 @@ void demo_task(void *params)
 
 void app_main()
 {
+    vTaskDelay(2000 / portTICK_RATE_MS);
+
     ESP_LOGI(TAG, "SDK version: %s", esp_get_idf_version());
     ESP_LOGI(TAG, "Heap when starting: %d", esp_get_free_heap_size());
 
