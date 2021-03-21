@@ -280,6 +280,13 @@ void app_main()
 #ifdef HAGL_HAL_USE_BUFFERING
     xTaskCreatePinnedToCore(flush_task, "Flush", 4096, NULL, 1, NULL, 0);
 #endif
+
+#ifdef CONFIG_IDF_TARGET_ESP32S2
+    /* ESP32-S2 has only one core, run everthing in core 0. */
+    xTaskCreatePinnedToCore(demo_task, "Demo", 8092, NULL, 1, NULL, 0);
+    xTaskCreatePinnedToCore(switch_task, "Switch", 2048, NULL, 2, NULL, 0);
+#else
     xTaskCreatePinnedToCore(demo_task, "Demo", 8092, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(switch_task, "Switch", 2048, NULL, 2, NULL, 1);
+#endif /* CONFIG_IDF_TARGET_ESP32S2 */
 }
