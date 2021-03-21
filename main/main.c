@@ -128,6 +128,9 @@ void switch_task(void *params)
         /* Print the message in the console. */
         ESP_LOGI(TAG, "%s %.*f FPS", demo[effect], 1, fb_fps);
 
+        hagl_clear_screen();
+        hagl_flush();
+
         switch(effect) {
         case 0:
             //metaballs_close();
@@ -143,7 +146,6 @@ void switch_task(void *params)
             break;
         }
 
-        hagl_clear_screen();
         effect = (effect + 1) % 4;
 
         switch(effect) {
