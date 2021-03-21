@@ -69,7 +69,7 @@ static char demo[4][32] = {
     "3 METABALLS   ",
     "PALETTE PLASMA",
     "ROTOZOOM      ",
-    "2D DEFORM     ",
+    "PLANE DEFORM     ",
 };
 
 /*
@@ -80,6 +80,7 @@ void flush_task(void *params)
 {
     while (1) {
         size_t bytes = 0;
+
         EventBits_t bits = xEventGroupWaitBits(
             event,
             RENDER_FINISHED,
