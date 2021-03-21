@@ -50,7 +50,7 @@ static const uint8_t MIN_VELOCITY = 3;
 static const uint8_t MAX_VELOCITY = 5;
 static const uint8_t MIN_RADIUS = 12;
 static const uint8_t MAX_RADIUS = 22;
-static const uint8_t STEP = 1;
+static const uint8_t PIXEL_SIZE = 1;
 
 void metaballs_init()
 {
@@ -86,19 +86,19 @@ void metaballs_animate()
 /* http://www.geisswerks.com/ryan/BLOBS/blobs.html */
 void metaballs_render()
 {
-    color_t background = hagl_color(0, 0, 0);
-    color_t black = hagl_color(0, 0, 0);
-    color_t white = hagl_color(255, 255, 255);
-    color_t green = hagl_color(0, 255, 0);
+    const color_t background = hagl_color(0, 0, 0);
+    const color_t black = hagl_color(0, 0, 0);
+    const color_t white = hagl_color(255, 255, 255);
+    const color_t green = hagl_color(0, 255, 0);
     color_t color;
 
-    for (uint16_t y = 0; y < DISPLAY_HEIGHT; y = y + STEP) {
-        for (uint16_t x = 0; x < DISPLAY_WIDTH; x = x + STEP) {
+    for (uint16_t y = 0; y < DISPLAY_HEIGHT; y += PIXEL_SIZE) {
+        for (uint16_t x = 0; x < DISPLAY_WIDTH; x += PIXEL_SIZE) {
             float sum = 0;
             for (uint8_t i = 0; i < NUM_BALLS; i++) {
-                float dx = x - balls[i].position.x;
-                float dy = y - balls[i].position.y;
-                float d2 = dx * dx + dy * dy;
+                const float dx = x - balls[i].position.x;
+                const float dy = y - balls[i].position.y;
+                const float d2 = dx * dx + dy * dy;
                 sum += balls[i].radius * balls[i].radius / d2;
                 // sum += balls[i].radius / sqrt(d2);
             }
@@ -113,10 +113,10 @@ void metaballs_render()
                 color = background;
             }
 
-            if (1 == STEP) {
+            if (1 == PIXEL_SIZE) {
                 hagl_put_pixel(x, y, color);
             } else {
-                hagl_fill_rectangle(x, y, x + STEP - 1, y + STEP - 1, color);
+                hagl_fill_rectangle(x, y, x + PIXEL_SIZE - 1, y + PIXEL_SIZE - 1, color);
             }
         }
     }

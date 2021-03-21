@@ -44,23 +44,22 @@ void plasma_init()
     palette = malloc(256 * sizeof(color_t));
 
     /* Generate nice continous palette. */
-    for(int i = 0; i < 256; i++) {
-        uint8_t r, g, b;
-        r = 128.0 + 128.0 * sin((M_PI * i / 128.0) + 1);
-        g = 128.0 + 128.0 * sin((M_PI * i / 64.0) + 1);
-        b = 64;
+    for(uint16_t i = 0; i < 256; i++) {
+        const uint8_t r = 128.0f + 128.0f * sin((M_PI * i / 128.0f) + 1);
+        const uint8_t g = 128.0f + 128.0f * sin((M_PI * i / 64.0f) + 1);
+        const uint8_t b = 64;
         palette[i] = hagl_color(r, g, b);
     }
 
     for (uint16_t y = 0; y < DISPLAY_HEIGHT; y += PIXEL_SIZE) {
         for (uint16_t x = 0; x < DISPLAY_WIDTH; x += PIXEL_SIZE) {
                 /* Generate three different sinusoids. */
-                float v1 = 128.0 + (128.0 * sin(x / 32.0));
-                float v2 = 128.0 + (128.0 * sin(y / 24.0));
-                float v3 = 128.0 + (128.0 * sin(sqrt(x * x + y * y) / 24.0));
+                const float v1 = 128.0f + (128.0f * sin(x / 32.0f));
+                const float v2 = 128.0f + (128.0f * sin(y / 24.0f));
+                const float v3 = 128.0f + (128.0f * sin(sqrt(x * x + y * y) / 24.0f));
                 /* Calculate average of the three sinusoids */
                 /* and use it as color index. */
-                uint8_t color = (v1 + v2 + v3) / 3;
+                const uint8_t color = (v1 + v2 + v3) / 3;
                 *(ptr++) = color;
         }
     }
@@ -70,11 +69,11 @@ void plasma_render()
 {
     uint8_t *ptr = plasma;
 
-    for (uint16_t y = 0; y < DISPLAY_HEIGHT; y = y + PIXEL_SIZE) {
-        for (uint16_t x = 0; x < DISPLAY_WIDTH; x = x + PIXEL_SIZE) {
+    for (uint16_t y = 0; y < DISPLAY_HEIGHT; y += PIXEL_SIZE) {
+        for (uint16_t x = 0; x < DISPLAY_WIDTH; x += PIXEL_SIZE) {
             /* Get a color for pixel from the plasma buffer. */
-            uint8_t index = *(ptr++);
-            color_t color = palette[index];
+            const uint8_t index = *(ptr++);
+            const color_t color = palette[index];
             /* Put a pixel to the display. */
             if (1 == PIXEL_SIZE) {
                 hagl_put_pixel(x, y, color);
@@ -91,11 +90,10 @@ void plasma_animate()
 
     for (uint16_t y = 0; y < DISPLAY_HEIGHT; y = y + PIXEL_SIZE) {
         for (uint16_t x = 0; x < DISPLAY_WIDTH; x = x + PIXEL_SIZE) {
-                /* Get a pixel from the plasma buffer. */
-                uint8_t index = *ptr;
-                /* Choose next color from the palette. */
-                index = (index + SPEED) % 256;
-                /* Put a pixel to the plasma buffer. */
+                /* Get a color from plasma and choose the next color. */
+                /* Unsigned integers wrap automatically. */
+                const uint8_t index = *ptr + SPEED;
+                /* Put the new color back to the plasma buffer. */
                 *(ptr++) = index;
         }
     }
