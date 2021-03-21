@@ -54,6 +54,7 @@ SPDX-License-Identifier: MIT-0
 #include "metaballs.h"
 #include "plasma.h"
 #include "rotozoom.h"
+#include "deform.h"
 
 static const char *TAG = "main";
 static EventGroupHandle_t event;
@@ -64,10 +65,11 @@ static uint8_t effect = 0;
 static const uint8_t RENDER_FINISHED = (1 << 0);
 static const uint8_t FLUSH_STARTED= (1 << 1);
 
-static char demo[3][32] = {
+static char demo[4][32] = {
     "3 METABALLS   ",
     "PALETTE PLASMA",
     "ROTOZOOM      ",
+    "2D DEFORM     ",
 };
 
 /*
@@ -126,8 +128,43 @@ void switch_task(void *params)
         /* Print the message in the console. */
         ESP_LOGI(TAG, "%s %.*f FPS", demo[effect], 1, fb_fps);
 
+        switch(effect) {
+        case 0:
+            //metaballs_close();
+            break;
+        case 1:
+            plasma_close();
+            break;
+        case 2:
+            //rotozoom_close();
+            break;
+        case 3:
+            deform_close();
+            break;
+        }
+
         hagl_clear_screen();
-        effect = (effect + 1) % 3;
+        effect = (effect + 1) % 4;
+
+        switch(effect) {
+        case 0:
+            metaballs_init();
+            ESP_LOGI(TAG, "Heap after metaballs init: %d", esp_get_free_heap_size());
+            break;
+        case 1:
+            plasma_init();
+            ESP_LOGI(TAG, "Heap after plasma init: %d", esp_get_free_heap_size());
+            break;
+        case 2:
+            rotozoom_init();
+            ESP_LOGI(TAG, "Heap after rotozoom init: %d", esp_get_free_heap_size());
+            break;
+        case 3:
+            deform_init();
+            ESP_LOGI(TAG, "Heap after deform init: %d", esp_get_free_heap_size());
+            break;
+        }
+
         aps(APS_RESET);
 
         vTaskDelay(10000 / portTICK_RATE_MS);
@@ -143,13 +180,6 @@ void demo_task(void *params)
 {
     color_t green = hagl_color(0, 255, 0);
     wchar_t message[128];
-
-    ESP_LOGI(TAG, "Initializing metaballs");
-    metaballs_init();
-    ESP_LOGI(TAG, "Initializing plasma");
-    plasma_init();
-    ESP_LOGI(TAG, "Initializing rotozoom");
-    rotozoom_init();
 
     /* Avoid waiting when running for the first time. */
     xEventGroupSetBits(event, RENDER_FINISHED);
@@ -170,6 +200,11 @@ void demo_task(void *params)
             rotozoom_animate();
             wait_for_vsync();
             rotozoom_render();
+            break;
+        case 3:
+            deform_animate();
+            wait_for_vsync();
+            deform_render();
             break;
         }
         /* Notify flush task that rendering has finished. */
