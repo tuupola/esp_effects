@@ -2,7 +2,7 @@
 
 MIT No Attribution
 
-Copyright (c) 2020 Mika Tuupola
+Copyright (c) 2020-2021 Mika Tuupola
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,50 +25,52 @@ SPDX-License-Identifier: MIT-0
 
 */
 
+#include <stdlib.h>
 #include <math.h>
 #include <hagl.h>
 
 #include "head.h"
 
-static const uint8_t SPEED = 2;
-static const uint8_t STEP = 2;
+static const uint8_t SPEED = 1;
+static const uint8_t STEP = 1;
 
 static uint16_t angle;
-static float sinlut[360];
-static float coslut[360];
+// static float sinlut[360];
+// static float coslut[360];
 
 void rotozoom_init()
 {
     /* Generate look up tables. */
-    for (uint16_t i = 0; i < 360; i++) {
-        sinlut[i] = sin(i * M_PI / 180);
-        coslut[i] = cos(i * M_PI / 180);
-    }
+    // for (uint16_t i = 0; i < 360; i++) {
+    //     sinlut[i] = sin(i * M_PI / 180);
+    //     coslut[i] = cos(i * M_PI / 180);
+    // }
 }
 
 void rotozoom_render()
 {
     float s, c, z;
 
-    // s = sin(angle * M_PI / 180);
-    // c = cos(angle * M_PI / 180);
-    s = sinlut[angle];
-    c = coslut[angle];
+    s = sin(angle * M_PI / 180);
+    c = cos(angle * M_PI / 180);
+    // s = sinlut[angle];
+    // c = coslut[angle];
     z = s * 1.2;
 
     for (uint16_t x = 0; x < DISPLAY_WIDTH; x = x + STEP) {
         for (uint16_t y = 0; y < DISPLAY_HEIGHT; y = y + STEP) {
 
             /* Get a rotated pixel from the head image. */
-            uint8_t u = (uint8_t)((x * c - y * s) * z) % HEAD_WIDTH;
-            uint8_t v = (uint8_t)((x * s + y * c) * z) % HEAD_HEIGHT;
+            int16_t u = (int16_t)((x * c - y * s) * z) % HEAD_WIDTH;
+            int16_t v = (int16_t)((x * s + y * c) * z) % HEAD_HEIGHT;
+
+            u = abs(u);
+            if (v < 0) {
+                v += HEAD_HEIGHT;
+            }
             color_t *color = (color_t*) (head + HEAD_WIDTH * sizeof(color_t) * v + sizeof(color_t) * u);
 
-            if (1 == STEP) {
-                hagl_put_pixel(x, y, *color);
-            } else {
-                hagl_fill_rectangle(x, y, x + STEP - 1, y + STEP - 1, *color);
-            }
+            hagl_put_pixel(x, y, *color);
         }
     }
 }
