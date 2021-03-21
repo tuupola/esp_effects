@@ -35,8 +35,8 @@ SPDX-License-Identifier: MIT-0
 color_t *palette;
 uint8_t *plasma;
 
-static const uint8_t SPEED = 6;
-static const uint8_t STEP = 2;
+static const uint8_t SPEED = 4;
+static const uint8_t STEP = 1;
 
 void plasma_init()
 {
@@ -98,4 +98,10 @@ void plasma_animate()
                 *ptr = color;
         }
     }
+}
+
+void plasma_close()
+{
+    free(plasma);
+    free(palette);
 }

@@ -2,7 +2,7 @@
 
 MIT No Attribution
 
-Copyright (c) 2020 Mika Tuupola
+Copyright (c) 2020-2021 Mika Tuupola
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,8 @@ SOFTWARE.
 SPDX-License-Identifier: MIT-0
 
 */
+
 void plasma_init();
 void plasma_animate();
 void plasma_render();
+void plasma_close();
