@@ -7,7 +7,7 @@ Created to test the [HAGL graphics library](https://github.com/tuupola/hagl). Fo
 Ready made config files for M5Stack, M5Stick C, M5Stick CPlus, TTGO T-Display, TTGO T4 V13 and TTGO T-Watch 2020. For example to compile and flash for M5Stack run the following.
 
 ```
-$ git clone git@github.com:tuupola/esp_effects.git --recursive
+$ git clone https://github.com/tuupola/esp_effects.git --recursive
 $ cd esp_effects
 $ cp sdkconfig.m5stack sdkconfig
 $ make -j8 flash
@@ -16,7 +16,7 @@ $ make -j8 flash
 If you have some other board or display run menuconfig yourself. For smaller screens triple buffering offers the smoothest animations.
 
 ```
-$ git clone git@github.com:tuupola/esp_effects.git --recursive
+$ git clone https://github.com/tuupola/esp_effects.git --recursive
 $ cd esp_effects
 $ make menuconfig
 $ make -j8 flash
