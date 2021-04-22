@@ -10,3 +10,6 @@
 [submodule "components/axp192"]
 	path = components/axp192
 	url = https://github.com/tuupola/axp192.git
+[submodule "components/hagl_hal"]
+	path = components/hagl_hal
+	url = https://github.com/tuupola/hagl_esp_solomon.git
