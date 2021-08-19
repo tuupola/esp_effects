@@ -22,6 +22,15 @@ $ make menuconfig
 $ make -j8 flash
 ```
 
+Or if you are using the new build system.
+
+```
+$ git clone https://github.com/tuupola/esp_effects.git --recursive
+$ cd esp_effects
+$ idf.py menuconfig
+$ idf.py build flash
+```
+
 ## Run on computer
 
 HAGL is hardware agnostic. You can run the demos also [on your computer](https://github.com/tuupola/sdl2_effects).
