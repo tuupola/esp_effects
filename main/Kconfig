@@ -1,9 +1,12 @@
 menu "Device specific config"
+    config DEVICE_HAS_AXP202
+        bool "Use AXP202"
 
-config DEVICE_HAS_AXP202
-    bool "Use AXP202"
+    config DEVICE_HAS_AXP192
+        bool "Use AXP192"
 
-config DEVICE_HAS_AXP192
-    bool "Use AXP192"
-
+    if DEVICE_HAS_AXP192
+        config DEVICE_IS_M5STACK_CORE2
+            bool "Device is M5Stack Core2"
+    endif
 endmenu
