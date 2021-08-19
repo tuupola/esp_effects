@@ -36,7 +36,7 @@ color_t *palette;
 uint8_t *plasma;
 
 static const uint8_t SPEED = 4;
-static const uint8_t PIXEL_SIZE = 1;
+static const uint8_t PIXEL_SIZE = 2;
 
 void plasma_init()
 {

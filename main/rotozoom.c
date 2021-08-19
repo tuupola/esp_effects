@@ -31,8 +31,8 @@ SPDX-License-Identifier: MIT-0
 
 #include "head.h"
 
-static const uint8_t SPEED = 1;
-static const uint8_t STEP = 1;
+static const uint8_t SPEED = 2;
+static const uint8_t PIXEL_SIZE = 2;
 
 static uint16_t angle;
 // static float sinlut[360];
@@ -57,8 +57,8 @@ void rotozoom_render()
     // c = coslut[angle];
     z = s * 1.2;
 
-    for (uint16_t x = 0; x < DISPLAY_WIDTH; x = x + STEP) {
-        for (uint16_t y = 0; y < DISPLAY_HEIGHT; y = y + STEP) {
+    for (uint16_t x = 0; x < DISPLAY_WIDTH; x = x + PIXEL_SIZE) {
+        for (uint16_t y = 0; y < DISPLAY_HEIGHT; y = y + PIXEL_SIZE) {
 
             /* Get a rotated pixel from the head image. */
             int16_t u = (int16_t)((x * c - y * s) * z) % HEAD_WIDTH;
@@ -70,6 +70,11 @@ void rotozoom_render()
             }
             color_t *color = (color_t*) (head + HEAD_WIDTH * sizeof(color_t) * v + sizeof(color_t) * u);
 
+            if (1 == PIXEL_SIZE) {
+                hagl_put_pixel(x, y, *color);
+            } else {
+                hagl_fill_rectangle(x, y, x + PIXEL_SIZE - 1, y + PIXEL_SIZE - 1, *color);
+            }
             hagl_put_pixel(x, y, *color);
         }
     }
