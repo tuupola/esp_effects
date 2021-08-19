@@ -271,14 +271,14 @@ void app_main()
 #ifdef CONFIG_DEVICE_IS_M5STACK_CORE2
     /* Turn vibration off. */
     vTaskDelay(200 / portTICK_RATE_MS);
-    axp192_ioctl(&axp, AXP192_LDO3_DISABLE, NULL);
+    axp192_ioctl(&axp, AXP192_LDO3_SET_CONTROL, AXP192_DISABLE);
 
     /* Hard reset the display. */
-    axp192_ioctl(&axp, AXP192_GPIO4_SET_LEVEL, AXP192_GPIO_HIGH);
+    axp192_ioctl(&axp, AXP192_GPIO4_SET_LEVEL, AXP192_HIGH);
     vTaskDelay(120 / portTICK_RATE_MS);
-    axp192_ioctl(&axp, AXP192_GPIO4_SET_LEVEL, AXP192_GPIO_LOW);
+    axp192_ioctl(&axp, AXP192_GPIO4_SET_LEVEL, AXP192_LOW);
     vTaskDelay(120 / portTICK_RATE_MS);
-    axp192_ioctl(&axp, AXP192_GPIO4_SET_LEVEL, AXP192_GPIO_HIGH);
+    axp192_ioctl(&axp, AXP192_GPIO4_SET_LEVEL, AXP192_HIGH);
     vTaskDelay(120 / portTICK_RATE_MS);
 #endif /* DEVICE_IS_M5STACK_CORE2 */
 #endif /* CONFIG_DEVICE_HAS_AXP192 */
