@@ -27,5 +27,5 @@ SPDX-License-Identifier: MIT-0
 
 void plasma_init();
 void plasma_animate();
-void plasma_render();
+void plasma_render(hagl_backend_t const *surface);
 void plasma_close();

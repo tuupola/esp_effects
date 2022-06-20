@@ -47,7 +47,7 @@ void rotozoom_init()
     // }
 }
 
-void rotozoom_render()
+void rotozoom_render(hagl_backend_t const *surface)
 {
     float s, c, z;
 
@@ -71,11 +71,11 @@ void rotozoom_render()
             color_t *color = (color_t*) (head + HEAD_WIDTH * sizeof(color_t) * v + sizeof(color_t) * u);
 
             if (1 == PIXEL_SIZE) {
-                hagl_put_pixel(x, y, *color);
+                hagl_put_pixel(surface, x, y, *color);
             } else {
-                hagl_fill_rectangle(x, y, x + PIXEL_SIZE - 1, y + PIXEL_SIZE - 1, *color);
+                hagl_fill_rectangle(surface, x, y, x + PIXEL_SIZE - 1, y + PIXEL_SIZE - 1, *color);
             }
-            hagl_put_pixel(x, y, *color);
+            // hagl_put_pixel(x, y, *color);
         }
     }
 }

@@ -58,9 +58,10 @@ SPDX-License-Identifier: MIT-0
 
 static const char *TAG = "main";
 static EventGroupHandle_t event;
-static float fb_fps;
-static float fb_bps;
+static fps_instance_t fps;
+static aps_instance_t bps;
 static uint8_t effect = 0;
+static hagl_backend_t *display;
 
 static const uint8_t RENDER_FINISHED = (1 << 0);
 static const uint8_t FLUSH_STARTED= (1 << 1);
@@ -92,9 +93,9 @@ void flush_task(void *params)
         /* Flush only when RENDER_FINISHED is set. */
         if ((bits & RENDER_FINISHED) != 0 ) {
             xEventGroupSetBits(event, FLUSH_STARTED);
-            bytes = hagl_flush();
-            fb_bps = aps(bytes);
-            fb_fps = fps();
+            bytes = hagl_flush(display);
+            aps_update(&bps, bytes);
+            fps_update(&fps);
         }
     }
 
@@ -127,10 +128,10 @@ void switch_task(void *params)
 {
     while (1) {
         /* Print the message in the console. */
-        ESP_LOGI(TAG, "%s %.*f FPS", demo[effect], 1, fb_fps);
+        ESP_LOGI(TAG, "%s %.*f FPS", demo[effect], 1, fps.current);
 
-        hagl_clear_screen();
-        hagl_flush();
+        hagl_clear_screen(display);
+        hagl_flush(display);
 
         switch(effect) {
         case 0:
@@ -168,7 +169,7 @@ void switch_task(void *params)
             break;
         }
 
-        aps(APS_RESET);
+        aps_reset(&bps);
 
         vTaskDelay(10000 / portTICK_RATE_MS);
     }
@@ -192,22 +193,22 @@ void demo_task(void *params)
         case 0:
             metaballs_animate();
             wait_for_vsync();
-            metaballs_render();
+            metaballs_render(display);
             break;
         case 1:
             plasma_animate();
             wait_for_vsync();
-            plasma_render();
+            plasma_render(display);
             break;
         case 2:
             rotozoom_animate();
             wait_for_vsync();
-            rotozoom_render();
+            rotozoom_render(display);
             break;
         case 3:
             deform_animate();
             wait_for_vsync();
-            deform_render();
+            deform_render(display);
             break;
         }
         /* Notify flush task that rendering has finished. */
@@ -215,18 +216,18 @@ void demo_task(void *params)
 
         /* Print the message on top left corner. */
         swprintf(message, sizeof(message), u"%s    ", demo[effect]);
-        hagl_set_clip_window(0, 0, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 1);
-        hagl_put_text(message, 4, 4, green, font6x9);
+        hagl_set_clip_window(display, 0, 0, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 1);
+        hagl_put_text(display, message, 4, 4, green, font6x9);
 
         /* Print the message on lower left corner. */
-        swprintf(message, sizeof(message), u"%.*f FPS  ", 0, fb_fps);
-        hagl_put_text(message, 4, DISPLAY_HEIGHT - 14, green, font6x9);
+        swprintf(message, sizeof(message), u"%.*f FPS  ", 0, fps.current);
+        hagl_put_text(display, message, 4, DISPLAY_HEIGHT - 14, green, font6x9);
 
         /* Print the message on lower right corner. */
-        swprintf(message, sizeof(message), u"%.*f KBPS  ", 0, fb_bps / 1000);
-        hagl_put_text(message, DISPLAY_WIDTH - 60, DISPLAY_HEIGHT - 14, green, font6x9);
+        swprintf(message, sizeof(message), u"%.*f KBPS  ", 0, bps.current / 1000);
+        hagl_put_text(display, message, DISPLAY_WIDTH - 60, DISPLAY_HEIGHT - 14, green, font6x9);
 
-        hagl_set_clip_window(0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
+        hagl_set_clip_window(display, 0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
     }
 
     vTaskDelete(NULL);
@@ -285,9 +286,12 @@ void app_main()
 
     event = xEventGroupCreate();
 
-    hagl_init();
+    display = hagl_init();
+    fps_init(&fps);
+    aps_init(&bps);
+
     /* Reserve 20 pixels in top and bottom for debug texts. */
-    hagl_set_clip_window(0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
+    hagl_set_clip_window(display, 0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
 
     ESP_LOGI(TAG, "Heap after HAGL init: %d", esp_get_free_heap_size());
 

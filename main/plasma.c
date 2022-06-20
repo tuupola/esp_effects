@@ -38,7 +38,7 @@ uint8_t *plasma;
 static const uint8_t SPEED = 4;
 static const uint8_t PIXEL_SIZE = 2;
 
-void plasma_init()
+void plasma_init(hagl_backend_t const *surface)
 {
     uint8_t *ptr = plasma = malloc(DISPLAY_WIDTH * DISPLAY_HEIGHT * sizeof(uint8_t));
     palette = malloc(256 * sizeof(color_t));
@@ -65,7 +65,7 @@ void plasma_init()
     }
 }
 
-void plasma_render()
+void plasma_render(hagl_backend_t const *surface)
 {
     uint8_t *ptr = plasma;
 
@@ -76,9 +76,9 @@ void plasma_render()
             const color_t color = palette[index];
             /* Put a pixel to the display. */
             if (1 == PIXEL_SIZE) {
-                hagl_put_pixel(x, y, color);
+                hagl_put_pixel(surface, x, y, color);
             } else {
-                hagl_fill_rectangle(x, y, x + PIXEL_SIZE - 1, y + PIXEL_SIZE - 1, color);
+                hagl_fill_rectangle(surface, x, y, x + PIXEL_SIZE - 1, y + PIXEL_SIZE - 1, color);
             }
         }
     }

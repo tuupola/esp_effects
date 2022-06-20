@@ -84,7 +84,7 @@ void metaballs_animate()
 }
 
 /* http://www.geisswerks.com/ryan/BLOBS/blobs.html */
-void metaballs_render()
+void metaballs_render(hagl_backend_t const *surface)
 {
     const color_t background = hagl_color(0, 0, 0);
     const color_t black = hagl_color(0, 0, 0);
@@ -114,9 +114,9 @@ void metaballs_render()
             }
 
             if (1 == PIXEL_SIZE) {
-                hagl_put_pixel(x, y, color);
+                hagl_put_pixel(surface, x, y, color);
             } else {
-                hagl_fill_rectangle(x, y, x + PIXEL_SIZE - 1, y + PIXEL_SIZE - 1, color);
+                hagl_fill_rectangle(surface, x, y, x + PIXEL_SIZE - 1, y + PIXEL_SIZE - 1, color);
             }
         }
     }
