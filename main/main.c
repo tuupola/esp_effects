@@ -152,19 +152,19 @@ void switch_task(void *params)
 
         switch(effect) {
         case 0:
-            metaballs_init();
+            metaballs_init(display);
             ESP_LOGI(TAG, "Heap after metaballs init: %d", esp_get_free_heap_size());
             break;
         case 1:
-            plasma_init();
+            plasma_init(display);
             ESP_LOGI(TAG, "Heap after plasma init: %d", esp_get_free_heap_size());
             break;
         case 2:
-            rotozoom_init();
+            rotozoom_init(display);
             ESP_LOGI(TAG, "Heap after rotozoom init: %d", esp_get_free_heap_size());
             break;
         case 3:
-            deform_init();
+            deform_init(display);
             ESP_LOGI(TAG, "Heap after deform init: %d", esp_get_free_heap_size());
             break;
         }
@@ -182,7 +182,7 @@ void switch_task(void *params)
  */
 void demo_task(void *params)
 {
-    color_t green = hagl_color(0, 255, 0);
+    color_t green = hagl_color(display, 0, 255, 0);
     wchar_t message[128];
 
     /* Avoid waiting when running for the first time. */
