@@ -130,7 +130,7 @@ void switch_task(void *params)
         /* Print the message in the console. */
         ESP_LOGI(TAG, "%s %.*f FPS", demo[effect], 1, fps.current);
 
-        hagl_clear_screen(display);
+        hagl_clear(display);
         hagl_flush(display);
 
         switch(effect) {
