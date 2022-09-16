@@ -109,7 +109,7 @@ void flush_task(void *params)
  */
 static void wait_for_vsync()
 {
-#ifdef CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING
+#ifdef HAGL_HAS_HAL_BACK_BUFFER
     xEventGroupWaitBits(
         event,
         FLUSH_STARTED,
@@ -118,7 +118,7 @@ static void wait_for_vsync()
         10000 / portTICK_RATE_MS
     );
     ets_delay_us(18000);
-#endif /* CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING */
+#endif /* HAGL_HAS_HAL_BACK_BUFFER */
 }
 
 /*
@@ -295,7 +295,7 @@ void app_main()
 
     ESP_LOGI(TAG, "Heap after HAGL init: %d", esp_get_free_heap_size());
 
-#ifdef HAGL_HAL_USE_BUFFERING
+#ifdef HAGL_HAS_HAL_BACK_BUFFER
     xTaskCreatePinnedToCore(flush_task, "Flush", 4096, NULL, 1, NULL, 0);
 #endif
 
