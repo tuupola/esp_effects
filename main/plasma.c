@@ -38,7 +38,8 @@ uint8_t *plasma;
 static const uint8_t SPEED = 4;
 static const uint8_t PIXEL_SIZE = 2;
 
-void plasma_init(hagl_backend_t const *display)
+void
+plasma_init(hagl_backend_t const *display)
 {
     uint8_t *ptr = plasma = malloc(DISPLAY_WIDTH * DISPLAY_HEIGHT * sizeof(uint8_t));
     palette = malloc(256 * sizeof(color_t));
@@ -53,19 +54,20 @@ void plasma_init(hagl_backend_t const *display)
 
     for (uint16_t y = 0; y < DISPLAY_HEIGHT; y += PIXEL_SIZE) {
         for (uint16_t x = 0; x < DISPLAY_WIDTH; x += PIXEL_SIZE) {
-                /* Generate three different sinusoids. */
-                const float v1 = 128.0f + (128.0f * sin(x / 32.0f));
-                const float v2 = 128.0f + (128.0f * sin(y / 24.0f));
-                const float v3 = 128.0f + (128.0f * sin(sqrt(x * x + y * y) / 24.0f));
-                /* Calculate average of the three sinusoids */
-                /* and use it as color index. */
-                const uint8_t color = (v1 + v2 + v3) / 3;
-                *(ptr++) = color;
+            /* Generate three different sinusoids. */
+            const float v1 = 128.0f + (128.0f * sin(x / 32.0f));
+            const float v2 = 128.0f + (128.0f * sin(y / 24.0f));
+            const float v3 = 128.0f + (128.0f * sin(sqrt(x * x + y * y) / 24.0f));
+            /* Calculate average of the three sinusoids */
+            /* and use it as color index. */
+            const uint8_t color = (v1 + v2 + v3) / 3;
+            *(ptr++) = color;
         }
     }
 }
 
-void plasma_render(hagl_backend_t const *display)
+void
+plasma_render(hagl_backend_t const *display)
 {
     uint8_t *ptr = plasma;
 
@@ -84,22 +86,24 @@ void plasma_render(hagl_backend_t const *display)
     }
 }
 
-void plasma_animate()
+void
+plasma_animate()
 {
     uint8_t *ptr = plasma;
 
     for (uint16_t y = 0; y < DISPLAY_HEIGHT; y = y + PIXEL_SIZE) {
         for (uint16_t x = 0; x < DISPLAY_WIDTH; x = x + PIXEL_SIZE) {
-                /* Get a color from plasma and choose the next color. */
-                /* Unsigned integers wrap automatically. */
-                const uint8_t index = *ptr + SPEED;
-                /* Put the new color back to the plasma buffer. */
-                *(ptr++) = index;
+            /* Get a color from plasma and choose the next color. */
+            /* Unsigned integers wrap automatically. */
+            const uint8_t index = *ptr + SPEED;
+            /* Put the new color back to the plasma buffer. */
+            *(ptr++) = index;
         }
     }
 }
 
-void plasma_close()
+void
+plasma_close()
 {
     free(plasma);
     free(palette);

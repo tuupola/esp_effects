@@ -42,7 +42,8 @@ static uint32_t frame;
 
 int8_t *lut;
 
-void deform_init()
+void
+deform_init()
 {
     /* Allocate memory for lut and store address also to ptr. */
     int8_t *ptr = lut = malloc(DISPLAY_HEIGHT * DISPLAY_WIDTH * 2 * sizeof(int8_t));
@@ -96,7 +97,8 @@ void deform_init()
     }
 }
 
-void deform_render(hagl_backend_t const *display)
+void
+deform_render(hagl_backend_t const *display)
 {
     int8_t *ptr = lut;
 
@@ -111,7 +113,7 @@ void deform_render(hagl_backend_t const *display)
             v = abs(v) % HEAD_HEIGHT;
 
             /* Get the pixel from texture and put it to the screen. */
-            const color_t *color = (color_t*) (head + HEAD_WIDTH * sizeof(color_t) * v + sizeof(color_t) * u);
+            const color_t *color = (color_t *) (head + HEAD_WIDTH * sizeof(color_t) * v + sizeof(color_t) * u);
 
             if (1 == PIXEL_SIZE) {
                 hagl_put_pixel(display, x, y, *color);
@@ -122,12 +124,14 @@ void deform_render(hagl_backend_t const *display)
     }
 }
 
-void deform_animate()
+void
+deform_animate()
 {
     frame = frame + SPEED;
 }
 
-void deform_close()
+void
+deform_close()
 {
     free(lut);
 }

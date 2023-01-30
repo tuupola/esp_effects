@@ -38,7 +38,8 @@ static uint16_t angle;
 // static float sinlut[360];
 // static float coslut[360];
 
-void rotozoom_init()
+void
+rotozoom_init()
 {
     /* Generate look up tables. */
     // for (uint16_t i = 0; i < 360; i++) {
@@ -47,7 +48,8 @@ void rotozoom_init()
     // }
 }
 
-void rotozoom_render(hagl_backend_t const *display)
+void
+rotozoom_render(hagl_backend_t const *display)
 {
     float s, c, z;
 
@@ -68,7 +70,7 @@ void rotozoom_render(hagl_backend_t const *display)
             if (v < 0) {
                 v += HEAD_HEIGHT;
             }
-            color_t *color = (color_t*) (head + HEAD_WIDTH * sizeof(color_t) * v + sizeof(color_t) * u);
+            color_t *color = (color_t *) (head + HEAD_WIDTH * sizeof(color_t) * v + sizeof(color_t) * u);
 
             if (1 == PIXEL_SIZE) {
                 hagl_put_pixel(display, x, y, *color);
@@ -80,7 +82,8 @@ void rotozoom_render(hagl_backend_t const *display)
     }
 }
 
-void rotozoom_animate()
+void
+rotozoom_animate()
 {
     angle = (angle + SPEED) % 360;
 }
