@@ -216,7 +216,7 @@ void demo_task(void *params)
 
         /* Print the message on top left corner. */
         swprintf(message, sizeof(message), u"%s    ", demo[effect]);
-        hagl_set_clip_window(display, 0, 0, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 1);
+        hagl_set_clip(display, 0, 0, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 1);
         hagl_put_text(display, message, 4, 4, green, font6x9);
 
         /* Print the message on lower left corner. */
@@ -227,7 +227,7 @@ void demo_task(void *params)
         swprintf(message, sizeof(message), u"%.*f KBPS  ", 0, bps.current / 1000);
         hagl_put_text(display, message, DISPLAY_WIDTH - 60, DISPLAY_HEIGHT - 14, green, font6x9);
 
-        hagl_set_clip_window(display, 0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
+        hagl_set_clip(display, 0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
     }
 
     vTaskDelete(NULL);
@@ -291,7 +291,7 @@ void app_main()
     aps_init(&bps);
 
     /* Reserve 20 pixels in top and bottom for debug texts. */
-    hagl_set_clip_window(display, 0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
+    hagl_set_clip(display, 0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
 
     ESP_LOGI(TAG, "Heap after HAGL init: %d", esp_get_free_heap_size());
 
