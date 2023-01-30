@@ -2,7 +2,7 @@
 
 MIT No Attribution
 
-Copyright (c) 2020 Mika Tuupola
+Copyright (c) 2020-2023 Mika Tuupola
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -64,7 +64,7 @@ static uint8_t effect = 0;
 static hagl_backend_t *display;
 
 static const uint8_t RENDER_FINISHED = (1 << 0);
-static const uint8_t FLUSH_STARTED= (1 << 1);
+static const uint8_t FLUSH_STARTED = (1 << 1);
 
 static char demo[4][32] = {
     "3 METABALLS   ",
@@ -77,18 +77,19 @@ static char demo[4][32] = {
  * Flushes the backbuffer to the display. Needed when using
  * double or triple buffering.
  */
-void flush_task(void *params)
+void
+flush_task(void *params)
 {
     while (1) {
         size_t bytes = 0;
 
         EventBits_t bits = xEventGroupWaitBits(
-            event,
-            RENDER_FINISHED,
-            pdTRUE,
-            pdFALSE,
-            0
-        );
+                event,
+                RENDER_FINISHED,
+                pdTRUE,
+                pdFALSE,
+                0
+            );
 
         /* Flush only when RENDER_FINISHED is set. */
         if ((bits & RENDER_FINISHED) != 0 ) {
@@ -107,7 +108,8 @@ void flush_task(void *params)
  * tearing when using double buffering, NOP otherwise. This
  * could be handler with IRQ's if the display supports it.
  */
-static void wait_for_vsync()
+static void
+wait_for_vsync()
 {
 #ifdef HAGL_HAS_HAL_BACK_BUFFER
     xEventGroupWaitBits(
@@ -124,7 +126,8 @@ static void wait_for_vsync()
 /*
  * Changes the effect every 10 seconds.
  */
-void switch_task(void *params)
+void
+switch_task(void *params)
 {
     while (1) {
         /* Print the message in the console. */
@@ -134,39 +137,39 @@ void switch_task(void *params)
         hagl_flush(display);
 
         switch(effect) {
-        case 0:
-            //metaballs_close();
-            break;
-        case 1:
-            plasma_close();
-            break;
-        case 2:
-            //rotozoom_close();
-            break;
-        case 3:
-            deform_close();
-            break;
+            case 0:
+                //metaballs_close();
+                break;
+            case 1:
+                plasma_close();
+                break;
+            case 2:
+                //rotozoom_close();
+                break;
+            case 3:
+                deform_close();
+                break;
         }
 
         effect = (effect + 1) % 4;
 
         switch(effect) {
-        case 0:
-            metaballs_init(display);
-            ESP_LOGI(TAG, "Heap after metaballs init: %d", esp_get_free_heap_size());
-            break;
-        case 1:
-            plasma_init(display);
-            ESP_LOGI(TAG, "Heap after plasma init: %d", esp_get_free_heap_size());
-            break;
-        case 2:
-            rotozoom_init(display);
-            ESP_LOGI(TAG, "Heap after rotozoom init: %d", esp_get_free_heap_size());
-            break;
-        case 3:
-            deform_init(display);
-            ESP_LOGI(TAG, "Heap after deform init: %d", esp_get_free_heap_size());
-            break;
+            case 0:
+                metaballs_init(display);
+                ESP_LOGI(TAG, "Heap after metaballs init: %d", esp_get_free_heap_size());
+                break;
+            case 1:
+                plasma_init(display);
+                ESP_LOGI(TAG, "Heap after plasma init: %d", esp_get_free_heap_size());
+                break;
+            case 2:
+                rotozoom_init(display);
+                ESP_LOGI(TAG, "Heap after rotozoom init: %d", esp_get_free_heap_size());
+                break;
+            case 3:
+                deform_init(display);
+                ESP_LOGI(TAG, "Heap after deform init: %d", esp_get_free_heap_size());
+                break;
         }
 
         aps_reset(&bps);
@@ -180,7 +183,8 @@ void switch_task(void *params)
 /*
  * Runs the actual demo effect.
  */
-void demo_task(void *params)
+void
+demo_task(void *params)
 {
     color_t green = hagl_color(display, 0, 255, 0);
     wchar_t message[128];
@@ -190,26 +194,26 @@ void demo_task(void *params)
 
     while (1) {
         switch(effect) {
-        case 0:
-            metaballs_animate();
-            wait_for_vsync();
-            metaballs_render(display);
-            break;
-        case 1:
-            plasma_animate();
-            wait_for_vsync();
-            plasma_render(display);
-            break;
-        case 2:
-            rotozoom_animate();
-            wait_for_vsync();
-            rotozoom_render(display);
-            break;
-        case 3:
-            deform_animate();
-            wait_for_vsync();
-            deform_render(display);
-            break;
+            case 0:
+                metaballs_animate();
+                wait_for_vsync();
+                metaballs_render(display);
+                break;
+            case 1:
+                plasma_animate();
+                wait_for_vsync();
+                plasma_render(display);
+                break;
+            case 2:
+                rotozoom_animate();
+                wait_for_vsync();
+                rotozoom_render(display);
+                break;
+            case 3:
+                deform_animate();
+                wait_for_vsync();
+                deform_render(display);
+                break;
         }
         /* Notify flush task that rendering has finished. */
         xEventGroupSetBits(event, RENDER_FINISHED);
@@ -233,7 +237,8 @@ void demo_task(void *params)
     vTaskDelete(NULL);
 }
 
-void app_main()
+void
+app_main()
 {
     vTaskDelay(2000 / portTICK_RATE_MS);
 
