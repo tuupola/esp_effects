@@ -186,7 +186,7 @@ switch_task(void *params)
 void
 demo_task(void *params)
 {
-    color_t green = hagl_color(display, 0, 255, 0);
+    hagl_color_t green = hagl_color(display, 0, 255, 0);
     wchar_t message[128];
 
     /* Avoid waiting when running for the first time. */

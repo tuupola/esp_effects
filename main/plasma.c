@@ -32,7 +32,7 @@ SPDX-License-Identifier: MIT-0
 
 #include "plasma.h"
 
-color_t *palette;
+hagl_color_t *palette;
 uint8_t *plasma;
 
 static const uint8_t SPEED = 4;
@@ -42,7 +42,7 @@ void
 plasma_init(hagl_backend_t const *display)
 {
     uint8_t *ptr = plasma = malloc(DISPLAY_WIDTH * DISPLAY_HEIGHT * sizeof(uint8_t));
-    palette = malloc(256 * sizeof(color_t));
+    palette = malloc(256 * sizeof(hagl_color_t));
 
     /* Generate nice continous palette. */
     for(uint16_t i = 0; i < 256; i++) {
@@ -75,7 +75,7 @@ plasma_render(hagl_backend_t const *display)
         for (uint16_t x = 0; x < DISPLAY_WIDTH; x += PIXEL_SIZE) {
             /* Get a color for pixel from the plasma buffer. */
             const uint8_t index = *(ptr++);
-            const color_t color = palette[index];
+            const hagl_color_t color = palette[index];
             /* Put a pixel to the display. */
             if (1 == PIXEL_SIZE) {
                 hagl_put_pixel(display, x, y, color);
