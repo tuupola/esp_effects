@@ -113,7 +113,7 @@ deform_render(hagl_backend_t const *display)
             v = abs(v) % HEAD_HEIGHT;
 
             /* Get the pixel from texture and put it to the screen. */
-            const color_t *color = (color_t *) (head + HEAD_WIDTH * sizeof(color_t) * v + sizeof(color_t) * u);
+            const hagl_color_t *color = (hagl_color_t *) (head + HEAD_WIDTH * sizeof(hagl_color_t) * v + sizeof(hagl_color_t) * u);
 
             if (1 == PIXEL_SIZE) {
                 hagl_put_pixel(display, x, y, *color);
