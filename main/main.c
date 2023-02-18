@@ -64,7 +64,6 @@ static uint8_t effect = 0;
 static hagl_backend_t *display;
 
 static const uint8_t RENDER_FINISHED = (1 << 0);
-static const uint8_t FLUSH_STARTED = (1 << 1);
 
 static char demo[4][32] = {
     "3 METABALLS   ",
@@ -84,16 +83,15 @@ flush_task(void *params)
         size_t bytes = 0;
 
         EventBits_t bits = xEventGroupWaitBits(
-                event,
-                RENDER_FINISHED,
-                pdTRUE,
-                pdFALSE,
-                0
-            );
+            event,
+            RENDER_FINISHED,
+            pdTRUE,
+            pdFALSE,
+            0
+        );
 
         /* Flush only when RENDER_FINISHED is set. */
         if ((bits & RENDER_FINISHED) != 0 ) {
-            xEventGroupSetBits(event, FLUSH_STARTED);
             bytes = hagl_flush(display);
             aps_update(&bps, bytes);
             fps_update(&fps);
@@ -101,26 +99,6 @@ flush_task(void *params)
     }
 
     vTaskDelete(NULL);
-}
-
-/*
- * Software vsync. Waits for flush to start. Needed to avoid
- * tearing when using double buffering, NOP otherwise. This
- * could be handler with IRQ's if the display supports it.
- */
-static void
-wait_for_vsync()
-{
-#ifdef HAGL_HAS_HAL_BACK_BUFFER
-    xEventGroupWaitBits(
-        event,
-        FLUSH_STARTED,
-        pdTRUE,
-        pdFALSE,
-        10000 / portTICK_PERIOD_MS
-    );
-    esp_rom_delay_us(18000);
-#endif /* HAGL_HAS_HAL_BACK_BUFFER */
 }
 
 /*
@@ -196,22 +174,18 @@ demo_task(void *params)
         switch(effect) {
             case 0:
                 metaballs_animate();
-                wait_for_vsync();
                 metaballs_render(display);
                 break;
             case 1:
                 plasma_animate();
-                wait_for_vsync();
                 plasma_render(display);
                 break;
             case 2:
                 rotozoom_animate();
-                wait_for_vsync();
                 rotozoom_render(display);
                 break;
             case 3:
                 deform_animate();
-                wait_for_vsync();
                 deform_render(display);
                 break;
         }
