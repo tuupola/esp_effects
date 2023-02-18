@@ -117,9 +117,9 @@ wait_for_vsync()
         FLUSH_STARTED,
         pdTRUE,
         pdFALSE,
-        10000 / portTICK_RATE_MS
+        10000 / portTICK_PERIOD_MS
     );
-    ets_delay_us(18000);
+    esp_rom_delay_us(18000);
 #endif /* HAGL_HAS_HAL_BACK_BUFFER */
 }
 
@@ -156,25 +156,25 @@ switch_task(void *params)
         switch(effect) {
             case 0:
                 metaballs_init(display);
-                ESP_LOGI(TAG, "Heap after metaballs init: %d", esp_get_free_heap_size());
+                ESP_LOGI(TAG, "Heap after metaballs init: %ld", esp_get_free_heap_size());
                 break;
             case 1:
                 plasma_init(display);
-                ESP_LOGI(TAG, "Heap after plasma init: %d", esp_get_free_heap_size());
+                ESP_LOGI(TAG, "Heap after plasma init: %ld", esp_get_free_heap_size());
                 break;
             case 2:
                 rotozoom_init(display);
-                ESP_LOGI(TAG, "Heap after rotozoom init: %d", esp_get_free_heap_size());
+                ESP_LOGI(TAG, "Heap after rotozoom init: %ld", esp_get_free_heap_size());
                 break;
             case 3:
                 deform_init(display);
-                ESP_LOGI(TAG, "Heap after deform init: %d", esp_get_free_heap_size());
+                ESP_LOGI(TAG, "Heap after deform init: %ld", esp_get_free_heap_size());
                 break;
         }
 
         aps_reset(&bps);
 
-        vTaskDelay(10000 / portTICK_RATE_MS);
+        vTaskDelay(10000 / portTICK_PERIOD_MS);
     }
 
     vTaskDelete(NULL);
@@ -240,10 +240,10 @@ demo_task(void *params)
 void
 app_main()
 {
-    vTaskDelay(2000 / portTICK_RATE_MS);
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
 
     ESP_LOGI(TAG, "SDK version: %s", esp_get_idf_version());
-    ESP_LOGI(TAG, "Heap when starting: %d", esp_get_free_heap_size());
+    ESP_LOGI(TAG, "Heap when starting: %ld", esp_get_free_heap_size());
 
 #ifdef CONFIG_DEVICE_HAS_AXP202
     /* TTGO T-Watch-2020 uses AXP202 PMU. */
@@ -276,16 +276,16 @@ app_main()
 
 #ifdef CONFIG_DEVICE_IS_M5STACK_CORE2
     /* Turn vibration off. */
-    vTaskDelay(200 / portTICK_RATE_MS);
+    vTaskDelay(200 / portTICK_PERIOD_MS);
     axp192_ioctl(&axp, AXP192_LDO3_DISABLE);
 
     /* Hard reset the display. */
     axp192_ioctl(&axp, AXP192_GPIO4_SET_LEVEL, AXP192_HIGH);
-    vTaskDelay(120 / portTICK_RATE_MS);
+    vTaskDelay(120 / portTICK_PERIOD_MS);
     axp192_ioctl(&axp, AXP192_GPIO4_SET_LEVEL, AXP192_LOW);
-    vTaskDelay(120 / portTICK_RATE_MS);
+    vTaskDelay(120 / portTICK_PERIOD_MS);
     axp192_ioctl(&axp, AXP192_GPIO4_SET_LEVEL, AXP192_HIGH);
-    vTaskDelay(120 / portTICK_RATE_MS);
+    vTaskDelay(120 / portTICK_PERIOD_MS);
 #endif /* DEVICE_IS_M5STACK_CORE2 */
 #endif /* CONFIG_DEVICE_HAS_AXP192 */
 
@@ -298,7 +298,7 @@ app_main()
     /* Reserve 20 pixels in top and bottom for debug texts. */
     hagl_set_clip(display, 0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
 
-    ESP_LOGI(TAG, "Heap after HAGL init: %d", esp_get_free_heap_size());
+    ESP_LOGI(TAG, "Heap after HAGL init: %ld", esp_get_free_heap_size());
 
 #ifdef HAGL_HAS_HAL_BACK_BUFFER
     xTaskCreatePinnedToCore(flush_task, "Flush", 4096, NULL, 1, NULL, 0);
