@@ -151,6 +151,7 @@ switch_task(void *params)
         }
 
         aps_reset(&bps);
+        fps_reset(&fps);
 
         vTaskDelay(10000 / portTICK_PERIOD_MS);
     }
