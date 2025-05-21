@@ -102,6 +102,37 @@ flush_task(void *params)
 }
 
 /*
+ * Update the displayed fps and kbps statistics every 250ms
+ */
+ void
+ stats_task(void *params)
+ {
+    hagl_color_t green = hagl_color(display, 0, 255, 0);
+    wchar_t message[128];
+
+    while (1) {
+        /* Print the message on top left corner. */
+        swprintf(message, sizeof(message), u"%s    ", demo[effect]);
+        hagl_set_clip(display, 0, 0, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 1);
+        hagl_put_text(display, message, 4, 4, green, font6x9);
+
+        /* Print the message on lower left corner. */
+        swprintf(message, sizeof(message), u"%.*f FPS  ", 0, fps.current);
+        hagl_put_text(display, message, 4, DISPLAY_HEIGHT - 14, green, font6x9);
+
+        /* Print the message on lower right corner. */
+        swprintf(message, sizeof(message), u"%.*f KBPS  ", 0, bps.current / 1000);
+        hagl_put_text(display, message, DISPLAY_WIDTH - 60, DISPLAY_HEIGHT - 14, green, font6x9);
+
+        hagl_set_clip(display, 0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
+
+        vTaskDelay(250 / portTICK_PERIOD_MS);
+    }
+
+     vTaskDelete(NULL);
+ }
+
+/*
  * Changes the effect every 10 seconds.
  */
 void
@@ -165,9 +196,6 @@ switch_task(void *params)
 void
 demo_task(void *params)
 {
-    hagl_color_t green = hagl_color(display, 0, 255, 0);
-    wchar_t message[128];
-
     /* Avoid waiting when running for the first time. */
     xEventGroupSetBits(event, RENDER_FINISHED);
 
@@ -193,20 +221,6 @@ demo_task(void *params)
         /* Notify flush task that rendering has finished. */
         xEventGroupSetBits(event, RENDER_FINISHED);
 
-        /* Print the message on top left corner. */
-        swprintf(message, sizeof(message), u"%s    ", demo[effect]);
-        hagl_set_clip(display, 0, 0, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 1);
-        hagl_put_text(display, message, 4, 4, green, font6x9);
-
-        /* Print the message on lower left corner. */
-        swprintf(message, sizeof(message), u"%.*f FPS  ", 0, fps.current);
-        hagl_put_text(display, message, 4, DISPLAY_HEIGHT - 14, green, font6x9);
-
-        /* Print the message on lower right corner. */
-        swprintf(message, sizeof(message), u"%.*f KBPS  ", 0, bps.current / 1000);
-        hagl_put_text(display, message, DISPLAY_WIDTH - 60, DISPLAY_HEIGHT - 14, green, font6x9);
-
-        hagl_set_clip(display, 0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
     }
 
     vTaskDelete(NULL);
@@ -282,9 +296,11 @@ app_main()
 #ifdef CONFIG_IDF_TARGET_ESP32S2
     /* ESP32-S2 has only one core, run everthing in core 0. */
     xTaskCreatePinnedToCore(demo_task, "Demo", 8092, NULL, 1, NULL, 0);
-    xTaskCreatePinnedToCore(switch_task, "Switch", 2048, NULL, 2, NULL, 0);
+    xTaskCreatePinnedToCore(switch_task, "Switch", 3072, NULL, 2, NULL, 0);
+    xTaskCreatePinnedToCore(stats_task, "Stats", 3072, NULL, 2, NULL, 0);
 #else
     xTaskCreatePinnedToCore(demo_task, "Demo", 8092, NULL, 1, NULL, 1);
-    xTaskCreatePinnedToCore(switch_task, "Switch", 2048, NULL, 2, NULL, 1);
+    xTaskCreatePinnedToCore(switch_task, "Switch", 3072, NULL, 2, NULL, 1);
+    xTaskCreatePinnedToCore(stats_task, "Stats", 3072, NULL, 2, NULL, 1);
 #endif /* CONFIG_IDF_TARGET_ESP32S2 */
 }
