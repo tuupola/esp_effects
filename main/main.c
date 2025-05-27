@@ -112,16 +112,16 @@ flush_task(void *params)
 
     while (1) {
         /* Print the message on top left corner. */
-        swprintf(message, sizeof(message), u"%s    ", demo[effect]);
+        swprintf(message, sizeof(message), L"%s    ", demo[effect]);
         hagl_set_clip(display, 0, 0, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 1);
         hagl_put_text(display, message, 4, 4, green, font6x9);
 
         /* Print the message on lower left corner. */
-        swprintf(message, sizeof(message), u"%.*f FPS  ", 0, fps.current);
+        swprintf(message, sizeof(message), L"%.*f FPS  ", 0, fps.current);
         hagl_put_text(display, message, 4, DISPLAY_HEIGHT - 14, green, font6x9);
 
         /* Print the message on lower right corner. */
-        swprintf(message, sizeof(message), u"%.*f KBPS  ", 0, bps.current / 1000);
+        swprintf(message, sizeof(message), L"%.*f KBPS  ", 0, bps.current / 1000);
         hagl_put_text(display, message, DISPLAY_WIDTH - 60, DISPLAY_HEIGHT - 14, green, font6x9);
 
         hagl_set_clip(display, 0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
@@ -293,8 +293,8 @@ app_main()
     xTaskCreatePinnedToCore(flush_task, "Flush", 4096, NULL, 1, NULL, 0);
 #endif
 
-#ifdef CONFIG_IDF_TARGET_ESP32S2
-    /* ESP32-S2 has only one core, run everthing in core 0. */
+#if defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32C6)
+    /* Single core boards. */
     xTaskCreatePinnedToCore(demo_task, "Demo", 8092, NULL, 1, NULL, 0);
     xTaskCreatePinnedToCore(switch_task, "Switch", 3072, NULL, 2, NULL, 0);
     xTaskCreatePinnedToCore(stats_task, "Stats", 3072, NULL, 2, NULL, 0);
@@ -302,5 +302,5 @@ app_main()
     xTaskCreatePinnedToCore(demo_task, "Demo", 8092, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(switch_task, "Switch", 3072, NULL, 2, NULL, 1);
     xTaskCreatePinnedToCore(stats_task, "Stats", 3072, NULL, 2, NULL, 1);
-#endif /* CONFIG_IDF_TARGET_ESP32S2 */
+#endif /* defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32C6) */
 }
