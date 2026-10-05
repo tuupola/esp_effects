@@ -28,13 +28,13 @@ SPDX-License-Identifier: MIT-0
 
 */
 
+#include <hagl.h>
+#include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <math.h>
-#include <hagl.h>
 
-#include "head.h"
 #include "deform.h"
+#include "head.h"
 
 static const uint8_t SPEED = 2;
 static const uint8_t PIXEL_SIZE = 1;
@@ -42,9 +42,7 @@ static uint32_t frame;
 
 int8_t *lut;
 
-void
-deform_init(hagl_backend_t const *display)
-{
+void deform_init(hagl_backend_t const *display) {
     /* Allocate memory for lut and store address also to ptr. */
     int8_t *ptr = lut = malloc(DISPLAY_HEIGHT * DISPLAY_WIDTH * 2 * sizeof(int8_t));
 
@@ -67,7 +65,6 @@ deform_init(hagl_backend_t const *display)
 
             // const float u = 1 / (r + 0.5 + 0.5 * sin(5 * a));
             // const float v = a * 3 / M_PI;
-
 
             // const float u = x * cos(2 * r) - y * sin(2 * r);
             // const float v = y * cos(2 * r) + x * sin(2 * r);
@@ -97,9 +94,7 @@ deform_init(hagl_backend_t const *display)
     }
 }
 
-void
-deform_render(hagl_backend_t const *display)
-{
+void deform_render(hagl_backend_t const *display) {
     int8_t *ptr = lut;
 
     for (uint16_t y = 0; y < DISPLAY_HEIGHT; y += PIXEL_SIZE) {
@@ -113,25 +108,25 @@ deform_render(hagl_backend_t const *display)
             v = abs(v) % HEAD_HEIGHT;
 
             /* Get the pixel from texture and put it to the screen. */
-            const hagl_color_t *color = (hagl_color_t *) (head + HEAD_WIDTH * sizeof(hagl_color_t) * v + sizeof(hagl_color_t) * u);
+            const hagl_color_t *color =
+                (hagl_color_t *)(head + HEAD_WIDTH * sizeof(hagl_color_t) * v +
+                                 sizeof(hagl_color_t) * u);
 
             if (1 == PIXEL_SIZE) {
                 hagl_put_pixel(display, x, y, *color);
             } else {
-                hagl_fill_rectangle(display, x, y, x + PIXEL_SIZE - 1, y + PIXEL_SIZE - 1, *color);
+                hagl_fill_rectangle(
+                    display, x, y, x + PIXEL_SIZE - 1, y + PIXEL_SIZE - 1, *color
+                );
             }
         }
     }
 }
 
-void
-deform_animate()
-{
+void deform_animate() {
     frame = frame + SPEED;
 }
 
-void
-deform_close()
-{
+void deform_close() {
     free(lut);
 }

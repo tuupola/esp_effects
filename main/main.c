@@ -27,34 +27,34 @@ SPDX-License-Identifier: MIT-0
 
 #include "sdkconfig.h"
 
+#include <esp_log.h>
+#include <freertos/event_groups.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-#include <freertos/event_groups.h>
-#include <esp_log.h>
 
 #ifdef CONFIG_DEVICE_HAS_AXP192
-#include <i2c_helper.h>
 #include <axp192.h>
+#include <i2c_helper.h>
 #endif /* CONFIG_DEVICE_HAS_AXP192 */
 #ifdef CONFIG_DEVICE_HAS_AXP202
-#include <i2c_helper.h>
 #include <axp202.h>
+#include <i2c_helper.h>
 #endif /* CONFIG_DEVICE_HAS_AXP202 */
 
-#include <font6x9.h>
 #include <aps.h>
+#include <font6x9.h>
 #include <fps.h>
-#include <hagl_hal.h>
 #include <hagl.h>
+#include <hagl_hal.h>
 
+#include "deform.h"
 #include "metaballs.h"
 #include "plasma.h"
 #include "rotozoom.h"
-#include "deform.h"
 
 static const char *TAG = "main";
 static EventGroupHandle_t event;
@@ -76,22 +76,15 @@ static char demo[4][32] = {
  * Flushes the backbuffer to the display. Needed when using
  * double or triple buffering.
  */
-void
-flush_task(void *params)
-{
+void flush_task(void *params) {
     while (1) {
         size_t bytes = 0;
 
-        EventBits_t bits = xEventGroupWaitBits(
-            event,
-            RENDER_FINISHED,
-            pdTRUE,
-            pdFALSE,
-            0
-        );
+        EventBits_t bits =
+            xEventGroupWaitBits(event, RENDER_FINISHED, pdTRUE, pdFALSE, 0);
 
         /* Flush only when RENDER_FINISHED is set. */
-        if ((bits & RENDER_FINISHED) != 0 ) {
+        if ((bits & RENDER_FINISHED) != 0) {
             bytes = hagl_flush(display);
             aps_update(&bps, bytes);
             fps_update(&fps);
@@ -104,9 +97,7 @@ flush_task(void *params)
 /*
  * Update the displayed fps and kbps statistics every 250ms
  */
- void
- stats_task(void *params)
- {
+void stats_task(void *params) {
     hagl_color_t green = hagl_color(display, 0, 255, 0);
     wchar_t message[128];
 
@@ -122,22 +113,22 @@ flush_task(void *params)
 
         /* Print the message on lower right corner. */
         swprintf(message, sizeof(message), L"%.*f KBPS  ", 0, bps.current / 1000);
-        hagl_put_text(display, message, DISPLAY_WIDTH - 60, DISPLAY_HEIGHT - 14, green, font6x9);
+        hagl_put_text(
+            display, message, DISPLAY_WIDTH - 60, DISPLAY_HEIGHT - 14, green, font6x9
+        );
 
         hagl_set_clip(display, 0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
 
         vTaskDelay(250 / portTICK_PERIOD_MS);
     }
 
-     vTaskDelete(NULL);
- }
+    vTaskDelete(NULL);
+}
 
 /*
  * Changes the effect every 10 seconds.
  */
-void
-switch_task(void *params)
-{
+void switch_task(void *params) {
     while (1) {
         /* Print the message in the console. */
         ESP_LOGI(TAG, "%s %.*f FPS", demo[effect], 1, fps.current);
@@ -145,7 +136,7 @@ switch_task(void *params)
         hagl_clear(display);
         hagl_flush(display);
 
-        switch(effect) {
+        switch (effect) {
             case 0:
                 //metaballs_close();
                 break;
@@ -162,7 +153,7 @@ switch_task(void *params)
 
         effect = (effect + 1) % 4;
 
-        switch(effect) {
+        switch (effect) {
             case 0:
                 metaballs_init(display);
                 ESP_LOGI(TAG, "Heap after metaballs init: %ld", esp_get_free_heap_size());
@@ -193,14 +184,12 @@ switch_task(void *params)
 /*
  * Runs the actual demo effect.
  */
-void
-demo_task(void *params)
-{
+void demo_task(void *params) {
     /* Avoid waiting when running for the first time. */
     xEventGroupSetBits(event, RENDER_FINISHED);
 
     while (1) {
-        switch(effect) {
+        switch (effect) {
             case 0:
                 metaballs_animate();
                 metaballs_render(display);
@@ -220,15 +209,12 @@ demo_task(void *params)
         }
         /* Notify flush task that rendering has finished. */
         xEventGroupSetBits(event, RENDER_FINISHED);
-
     }
 
     vTaskDelete(NULL);
 }
 
-void
-app_main()
-{
+void app_main() {
     vTaskDelay(2000 / portTICK_PERIOD_MS);
 
     ESP_LOGI(TAG, "SDK version: %s", esp_get_idf_version());
