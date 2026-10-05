@@ -43,7 +43,7 @@ static uint32_t frame;
 int8_t *lut;
 
 void
-deform_init()
+deform_init(hagl_backend_t const *display)
 {
     /* Allocate memory for lut and store address also to ptr. */
     int8_t *ptr = lut = malloc(DISPLAY_HEIGHT * DISPLAY_WIDTH * 2 * sizeof(int8_t));

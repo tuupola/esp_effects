@@ -53,7 +53,7 @@ static const uint8_t MAX_RADIUS = 32;
 static const uint8_t PIXEL_SIZE = 2;
 
 void
-metaballs_init()
+metaballs_init(hagl_backend_t const *display)
 {
     /* Set up imaginary balls inside screen coordinates. */
     for (int16_t i = 0; i < NUM_BALLS; i++) {

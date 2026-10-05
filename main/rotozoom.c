@@ -39,7 +39,7 @@ static uint16_t angle;
 // static float coslut[360];
 
 void
-rotozoom_init()
+rotozoom_init(hagl_backend_t const *display)
 {
     /* Generate look up tables. */
     // for (uint16_t i = 0; i < 360; i++) {

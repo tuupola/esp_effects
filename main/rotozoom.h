@@ -25,6 +25,6 @@ SPDX-License-Identifier: MIT-0
 
 */
 
-void rotozoom_init();
+void rotozoom_init(hagl_backend_t const *display);
 void rotozoom_render(hagl_backend_t const *surface);
 void rotozoom_animate();
